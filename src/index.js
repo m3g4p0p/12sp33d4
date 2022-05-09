@@ -1,4 +1,5 @@
 import tiles from './assets/tiles.png'
+import { velocity } from './components.js'
 import { k } from './init.js'
 import { range, thresh, tileAt, tileset, TILE_SIZE } from './util.js'
 
@@ -53,10 +54,11 @@ function groundLevel () {
 k.scene('main', () => {
   const start = k.vec2(TILE_SIZE, k.height() / 2)
 
-  const player = k.add([
+  const player = window.player = k.add([
     'player',
     k.sprite('player'),
     k.pos(start),
+    velocity(5),
     k.area(),
     k.body(),
     k.cleanup(),
@@ -77,23 +79,20 @@ k.scene('main', () => {
   })
 
   k.onMouseDown(() => {
-    player.dest = player.pos.add(100, 0)
+    player.velocity(100)
   })
 
   k.onCollide('player', 'wall', (player, _, collision) => {
     if (collision.isRight()) {
-      player.dest = player.pos
+      player.velocity(0)
     }
   })
 
   player.onUpdate(() => {
-    const velocity = thresh(player.dest.sub(player.pos).x, 5)
-    player.move(velocity, 0)
-
     setAnim(
       player,
       player.isGrounded()
-        ? velocity > 0
+        ? player.velocity() > 0
           ? 'walk'
           : 'idle'
         : player.isFalling()
