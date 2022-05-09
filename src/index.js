@@ -26,7 +26,7 @@ function addWall (pos, x, y) {
     k.pos(pos),
     k.area(),
     k.solid(),
-    k.cleanup()
+    k.cleanup({ offset: k.width() })
   ]).pos.add(k.RIGHT.scale(TILE_SIZE))
 }
 
@@ -36,7 +36,7 @@ function platform (start, length) {
   }, addWall(start, 0, 0))
 
   return addWall(pos, 0, 2).add(
-    k.randi(1, 2) * TILE_SIZE,
+    k.randi(2, 3) * TILE_SIZE,
     k.randi(-2, 2) * TILE_SIZE
   )
 }
