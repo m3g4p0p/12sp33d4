@@ -46,6 +46,10 @@ function setAnim (obj, anim, options) {
   }
 }
 
+function groundLevel () {
+  return Math.max(...k.get('wall').map(wall => wall.pos.y))
+}
+
 k.scene('main', () => {
   const start = k.vec2(TILE_SIZE, k.height() / 2)
 
@@ -95,6 +99,11 @@ k.scene('main', () => {
         : player.isFalling()
           ? 'fall'
           : 'jump'
+    )
+
+    k.camPos(
+      k.center().x + player.pos.x - TILE_SIZE,
+      Math.min(player.pos.y, groundLevel())
     )
   })
 
