@@ -25,7 +25,8 @@ function addWall (pos, x, y) {
     k.sprite(`wall-${x}-${y}`),
     k.pos(pos),
     k.area(),
-    k.solid()
+    k.solid(),
+    k.cleanup()
   ]).pos.add(k.RIGHT.scale(TILE_SIZE))
 }
 
@@ -46,15 +47,21 @@ function setState (obj, state) {
   }
 }
 
+function setAnim (obj, anim, options) {
+  if (obj.curAnim() !== anim) {
+    obj.play(anim, options)
+  }
+}
+
 k.scene('main', () => {
   const player = k.add([
     'player',
     k.sprite('player'),
-    k.state('idle', ['idle', 'walk', 'jump']),
-    k.pos(k.vec2(0, k.height() / 2)),
+    k.pos(k.vec2(TILE_SIZE, k.height() / 2)),
     deltaPos(),
     k.area(),
-    k.body()
+    k.body(),
+    k.cleanup()
   ])
 
   Array.from({ length: 5 }).reduce(pos => {
@@ -64,33 +71,34 @@ k.scene('main', () => {
   player.play('idle')
   k.gravity(100)
 
-  k.onKeyDown('x', () => {
-    setState(player, 'walk')
+  k.onClick(() => {
+    if (player.isGrounded()) {
+      player.jump(100)
+    }
   })
 
-  k.onKeyDown('y', () => {
-    setState(player, 'jump')
+  player.onUpdate(() => {
+    if (k.isMouseDown()) {
+      player.move(100, 0)
+    }
+
+    if (player.deltaPos.y < 0) {
+      return setAnim(player, 'jump')
+    }
+
+    if (player.deltaPos.y > 0) {
+      return setAnim(player, 'fall')
+    }
+
+    if (player.deltaPos.x > 0) {
+      return setAnim(player, 'walk', { loop: true })
+    }
+
+    setAnim(player, 'idle')
   })
 
-  k.onKeyRelease(['x', 'y'], () => {
-    setState(player, 'idle')
-  })
-
-  player.onStateEnter('walk', () => {
-    player.play('walk', { loop: true })
-  })
-
-  player.onStateEnter('jump', () => {
-    player.jump(100)
-    player.play('walk', { loop: true })
-  })
-
-  player.onStateEnter('idle', () => {
-    player.play('idle')
-  })
-
-  player.onStateUpdate('jump', () => {
-    player.play(player.deltaPos < 0 ? 'jump' : 'fall')
+  player.onDestroy(() => {
+    k.go('main')
   })
 })
 

@@ -4,19 +4,18 @@ import { k } from './init.js'
  * @returns {import("kaboom").Comp}
  */
 export function deltaPos () {
-  let pos
+  const pos = k.vec2()
 
   return {
     id: 'deltaPos',
     require: ['pos'],
-    // deltaPos: k.vec2(),
     add () {
       this.deltaPos = k.vec2()
-      pos = this.pos.clone()
+      Object.assign(pos, this.pos)
     },
     update () {
       this.deltaPos = this.pos.sub(pos)
-      pos = this.pos.clone()
+      Object.assign(pos, this.pos)
     }
   }
 }
