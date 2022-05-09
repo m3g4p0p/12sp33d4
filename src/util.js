@@ -1,11 +1,13 @@
 export const TILE_SIZE = 16
 
-export function tileAt (x, y) {
+export function tileAt (x, y, width = 1, height = 1) {
   return {
     x: x * TILE_SIZE,
     y: y * TILE_SIZE,
-    width: TILE_SIZE,
-    height: TILE_SIZE
+    width: width * TILE_SIZE,
+    height: height * TILE_SIZE,
+    sliceX: width,
+    sliceY: height
   }
 }
 

@@ -2,13 +2,23 @@ import tiles from './assets/tiles.png'
 import { k } from './init.js'
 import { range, tileAt, tileset, TILE_SIZE } from './util.js'
 
+const playerTile = tileAt(18, 9, 6)
+playerTile.y++
+
 k.loadSpriteAtlas(tiles, {
-  wallTopLeft: tileAt(18, 0),
-  ...tileset('wall', 18, 0, 3, 3)
+  ...tileset('wall', 18, 0, 3, 3),
+  player: {
+    ...playerTile,
+    anims: {
+      idle: 0,
+      walk: { from: 1, to: 2 }
+    }
+  }
 })
 
 function addWall (pos, x, y) {
   return k.add([
+    'wall',
     k.sprite(`wall-${x}-${y}`),
     k.pos(pos),
     k.area(),
@@ -27,10 +37,53 @@ function platform (start, length) {
   )
 }
 
+function setState (obj, state) {
+  if (obj.state !== state) {
+    obj.enterState(state)
+  }
+}
+
 k.scene('main', () => {
+  const player = k.add([
+    'player',
+    k.sprite('player'),
+    k.state('idle', ['idle', 'walk', 'jump']),
+    k.pos(k.vec2(0, k.height() / 2)),
+    k.area(),
+    k.body()
+  ])
+
   Array.from({ length: 5 }).reduce(pos => {
     return platform(pos, k.randi(10))
-  }, k.vec2(0, k.height() / 2))
+  }, player.pos.add(k.DOWN))
+
+  player.play('idle')
+  k.gravity(100)
+
+  k.onKeyDown('x', () => {
+    setState(player, 'walk')
+  })
+
+  k.onKeyDown('y', () => {
+    setState(player, 'jump')
+  })
+
+  k.onKeyRelease(['x', 'y'], () => {
+    setState(player, 'idle')
+  })
+
+  player.onStateEnter('walk', () => {
+    player.play('walk', { loop: true })
+  })
+
+  player.onStateEnter('jump', () => {
+    player.jump(100)
+    player.play('walk', { loop: true })
+  })
+
+  player.onStateEnter('idle', () => {
+    player.play('idle')
+  })
 })
 
 k.go('main')
