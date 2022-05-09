@@ -1,4 +1,4 @@
-const TILE_SIZE = 16
+export const TILE_SIZE = 16
 
 export function tileAt (x, y) {
   return {
@@ -9,7 +9,7 @@ export function tileAt (x, y) {
   }
 }
 
-function range (length) {
+export function range (length) {
   return Array.from({ length }, (_, i) => i)
 }
 
