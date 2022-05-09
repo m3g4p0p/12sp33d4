@@ -1,4 +1,5 @@
 import tiles from './assets/tiles.png'
+import { deltaPos } from './components.js'
 import { k } from './init.js'
 import { range, tileAt, tileset, TILE_SIZE } from './util.js'
 
@@ -11,7 +12,9 @@ k.loadSpriteAtlas(tiles, {
     ...playerTile,
     anims: {
       idle: 0,
-      walk: { from: 1, to: 2 }
+      walk: { from: 1, to: 2 },
+      jump: 3,
+      fall: 4
     }
   }
 })
@@ -49,6 +52,7 @@ k.scene('main', () => {
     k.sprite('player'),
     k.state('idle', ['idle', 'walk', 'jump']),
     k.pos(k.vec2(0, k.height() / 2)),
+    deltaPos(),
     k.area(),
     k.body()
   ])
@@ -83,6 +87,10 @@ k.scene('main', () => {
 
   player.onStateEnter('idle', () => {
     player.play('idle')
+  })
+
+  player.onStateUpdate('jump', () => {
+    player.play(player.deltaPos < 0 ? 'jump' : 'fall')
   })
 })
 
