@@ -19,6 +19,10 @@ function ranges (length, ...rest) {
   return Array.from({ length }, (_, i) => rest.length ? ranges(...rest) : i)
 }
 
+export function thresh (value, min) {
+  return value < min ? 0 : value
+}
+
 export function tileset (name, x, y, width, height) {
   return ranges(height, width).reduce((result, row, iY) => ({
     ...result,

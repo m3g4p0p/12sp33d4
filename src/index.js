@@ -1,7 +1,6 @@
 import tiles from './assets/tiles.png'
-import { deltaPos } from './components.js'
 import { k } from './init.js'
-import { range, tileAt, tileset, TILE_SIZE } from './util.js'
+import { range, thresh, tileAt, tileset, TILE_SIZE } from './util.js'
 
 const playerTile = tileAt(18, 9, 6)
 playerTile.y++
@@ -41,12 +40,6 @@ function platform (start, length) {
   )
 }
 
-function setState (obj, state) {
-  if (obj.state !== state) {
-    obj.enterState(state)
-  }
-}
-
 function setAnim (obj, anim, options) {
   if (obj.curAnim() !== anim) {
     obj.play(anim, options)
@@ -54,14 +47,16 @@ function setAnim (obj, anim, options) {
 }
 
 k.scene('main', () => {
+  const start = k.vec2(TILE_SIZE, k.height() / 2)
+
   const player = k.add([
     'player',
     k.sprite('player'),
-    k.pos(k.vec2(TILE_SIZE, k.height() / 2)),
-    deltaPos(),
+    k.pos(start),
     k.area(),
     k.body(),
-    k.cleanup()
+    k.cleanup(),
+    { dest: start }
   ])
 
   Array.from({ length: 5 }).reduce(pos => {
@@ -77,24 +72,30 @@ k.scene('main', () => {
     }
   })
 
+  k.onMouseDown(() => {
+    player.dest = player.pos.add(100, 0)
+  })
+
+  k.onCollide('player', 'wall', (player, _, collision) => {
+    if (collision.isRight()) {
+      player.dest = player.pos
+    }
+  })
+
   player.onUpdate(() => {
-    if (k.isMouseDown()) {
-      player.move(100, 0)
-    }
+    const velocity = thresh(player.dest.sub(player.pos).x, 5)
+    player.move(velocity, 0)
 
-    if (player.deltaPos.y < 0) {
-      return setAnim(player, 'jump')
-    }
-
-    if (player.deltaPos.y > 0) {
-      return setAnim(player, 'fall')
-    }
-
-    if (player.deltaPos.x > 0) {
-      return setAnim(player, 'walk', { loop: true })
-    }
-
-    setAnim(player, 'idle')
+    setAnim(
+      player,
+      player.isGrounded()
+        ? velocity > 0
+          ? 'walk'
+          : 'idle'
+        : player.isFalling()
+          ? 'fall'
+          : 'jump'
+    )
   })
 
   player.onDestroy(() => {
