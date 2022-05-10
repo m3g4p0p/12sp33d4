@@ -1,4 +1,4 @@
-export const TILE_SIZE = 16
+import { TILE_SIZE } from './constants.js'
 
 export function tileAt (x, y, width = 1, height = 1) {
   return {

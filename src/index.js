@@ -1,8 +1,9 @@
 import tiles from './assets/tiles.png'
+import { PLAYER_SPEED, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 import { groundLevel, platformGenerator } from './platforms.js'
 import { spawnPlayer } from './spawn.js'
-import { tileAt, tileset, TILE_SIZE } from './util.js'
+import { tileAt, tileset } from './util.js'
 
 const playerTile = tileAt(18, 9, 6)
 playerTile.y++
@@ -53,12 +54,12 @@ k.scene('main', () => {
 
   k.onClick(() => {
     if (player.isGrounded()) {
-      player.jump(100)
+      player.jump(PLAYER_SPEED)
     }
   })
 
   k.onMouseDown(() => {
-    player.accelerate(100)
+    player.accelerate(PLAYER_SPEED)
   })
 
   k.onCollide('player', 'wall', (player, _, collision) => {
@@ -72,7 +73,7 @@ k.scene('main', () => {
     player.speed++
 
     gem.destroy()
-    player.accelerate(100)
+    player.accelerate(PLAYER_SPEED)
   })
 
   k.on('leave', 'gem', () => {

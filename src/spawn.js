@@ -1,6 +1,6 @@
 import { accelerate, velocity } from './components.js'
+import { TILE_SIZE } from './constants.js'
 import { k } from './init.js'
-import { TILE_SIZE } from './util.js'
 
 export function spawnPlayer () {
   const start = k.vec2(TILE_SIZE, k.height() / 2)

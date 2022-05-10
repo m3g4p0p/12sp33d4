@@ -1,6 +1,7 @@
 import { cleanLeft } from './components.js'
+import { TILE_SIZE } from './constants.js'
 import { k } from './init.js'
-import { range, TILE_SIZE } from './util.js'
+import { range } from './util.js'
 
 function addWall (pos, x, y) {
   return k.add([
