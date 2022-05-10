@@ -1,6 +1,6 @@
 import tiles from './assets/tiles.png'
 import { k } from './init.js'
-import { groundLevel, platform } from './platforms.js'
+import { groundLevel, platformGenerator } from './platforms.js'
 import { spawnPlayer } from './spawn.js'
 import { tileAt, tileset, TILE_SIZE } from './util.js'
 
@@ -29,12 +29,12 @@ function setAnim (obj, anim, options) {
 k.scene('main', () => {
   const player = spawnPlayer()
 
-  Array.from({ length: 5 }).reduce(pos => {
-    return platform(pos, k.randi(10))
-  }, player.pos.add(k.DOWN))
+  const spawnPlatforms = platformGenerator(
+    player.pos.add(k.DOWN), 10)
 
   player.play('idle')
   k.gravity(100)
+  spawnPlatforms()
 
   k.onClick(() => {
     if (player.isGrounded()) {
@@ -44,6 +44,15 @@ k.scene('main', () => {
 
   k.onMouseDown(() => {
     player.velocity(100)
+  })
+
+  k.onUpdate('wall', wall => {
+    if (k.toScreen(wall.pos).x > -wall.width) {
+      return
+    }
+
+    wall.destroy()
+    spawnPlatforms()
   })
 
   k.onCollide('player', 'wall', (player, _, collision) => {

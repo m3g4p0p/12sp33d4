@@ -7,9 +7,12 @@ function addWall (pos, x, y) {
     k.sprite(`wall-${x}-${y}`),
     k.pos(pos),
     k.area(),
-    k.solid(),
-    k.cleanup({ offset: k.width() })
+    k.solid()
   ]).pos.add(k.RIGHT.scale(TILE_SIZE))
+}
+
+export function groundLevel () {
+  return Math.max(...k.get('wall').map(wall => wall.pos.y))
 }
 
 export function platform (start, length) {
@@ -23,6 +26,13 @@ export function platform (start, length) {
   )
 }
 
-export function groundLevel () {
-  return Math.max(...k.get('wall').map(wall => wall.pos.y))
+export function platformGenerator (pos, maxLength) {
+  return function next () {
+    if (k.toScreen(pos).x > k.width() * 2) {
+      return
+    }
+
+    pos = platform(pos, k.randi(maxLength))
+    next()
+  }
 }
