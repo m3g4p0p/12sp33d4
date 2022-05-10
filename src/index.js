@@ -66,7 +66,10 @@ k.scene('main', () => {
 
     k.camPos(
       k.center().x + player.pos.x - TILE_SIZE,
-      Math.min(player.pos.y, groundLevel())
+      Math.min(player.pos.y, Math.max(
+        groundLevel(),
+        k.camPos().y
+      ))
     )
   })
 
