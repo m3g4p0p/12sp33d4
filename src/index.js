@@ -1,7 +1,8 @@
 import tiles from './assets/tiles.png'
-import { velocity } from './components.js'
 import { k } from './init.js'
-import { range, thresh, tileAt, tileset, TILE_SIZE } from './util.js'
+import { groundLevel, platform } from './platforms.js'
+import { spawnPlayer } from './spawn.js'
+import { tileAt, tileset, TILE_SIZE } from './util.js'
 
 const playerTile = tileAt(18, 9, 6)
 playerTile.y++
@@ -19,51 +20,14 @@ k.loadSpriteAtlas(tiles, {
   }
 })
 
-function addWall (pos, x, y) {
-  return k.add([
-    'wall',
-    k.sprite(`wall-${x}-${y}`),
-    k.pos(pos),
-    k.area(),
-    k.solid(),
-    k.cleanup({ offset: k.width() })
-  ]).pos.add(k.RIGHT.scale(TILE_SIZE))
-}
-
-function platform (start, length) {
-  const pos = range(length - 2).reduce(pos => {
-    return addWall(pos, 0, 1)
-  }, addWall(start, 0, 0))
-
-  return addWall(pos, 0, 2).add(
-    k.randi(2, 3) * TILE_SIZE,
-    k.randi(-2, 2) * TILE_SIZE
-  )
-}
-
 function setAnim (obj, anim, options) {
   if (obj.curAnim() !== anim) {
     obj.play(anim, options)
   }
 }
 
-function groundLevel () {
-  return Math.max(...k.get('wall').map(wall => wall.pos.y))
-}
-
 k.scene('main', () => {
-  const start = k.vec2(TILE_SIZE, k.height() / 2)
-
-  const player = window.player = k.add([
-    'player',
-    k.sprite('player'),
-    k.pos(start),
-    velocity(5),
-    k.area(),
-    k.body(),
-    k.cleanup(),
-    { dest: start }
-  ])
+  const player = spawnPlayer()
 
   Array.from({ length: 5 }).reduce(pos => {
     return platform(pos, k.randi(10))
