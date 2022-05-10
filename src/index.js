@@ -75,6 +75,10 @@ k.scene('main', () => {
       return
     }
 
+    if (player.pos.y <= gem.pos.y && !k.isMouseDown()) {
+      player.jump(PLAYER_SPEED)
+    }
+
     score.text += player.speed
     player.speed++
 
