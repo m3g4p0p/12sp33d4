@@ -3,6 +3,10 @@ import { TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 import { range } from './util.js'
 
+export function groundLevel () {
+  return Math.max(...k.get('wall').map(wall => wall.pos.y))
+}
+
 function addWall (pos, x, y) {
   return k.add([
     'wall',
@@ -14,11 +18,14 @@ function addWall (pos, x, y) {
   ]).pos.add(k.RIGHT.scale(TILE_SIZE))
 }
 
-function addGem (pos) {
+function addGem (start, length) {
   k.add([
     'gem',
     k.sprite('gem'),
-    k.pos(pos),
+    k.pos(start.add(k.vec2(
+      k.randi(length),
+      k.randi(-3)
+    ).scale(TILE_SIZE))),
     k.area(),
     k.scale(),
     k.opacity(),
@@ -26,24 +33,15 @@ function addGem (pos) {
   ])
 }
 
-export function groundLevel () {
-  return Math.max(...k.get('wall').map(wall => wall.pos.y))
-}
-
 /**
  * @param {import('kaboom').Vec2} start
  * @param {number} length
  * @returns {import('kaboom').Vec2}
  */
-export function addPlatform (start, length) {
+function addPlatform (start, length) {
   const pos = range(length - 2).reduce(pos => {
     return addWall(pos, 0, 1)
   }, addWall(start, 0, 0))
-
-  addGem(start.add(k.vec2(
-    k.randi(length),
-    k.randi(-3)
-  ).scale(TILE_SIZE)))
 
   return addWall(pos, 0, 2).add(
     k.randi(2, 3) * TILE_SIZE,
@@ -52,12 +50,22 @@ export function addPlatform (start, length) {
 }
 
 export function platformGenerator (pos, maxLength) {
+  let isFirst = true
+
   return function next () {
     if (k.toScreen(pos).x > k.width() * 2) {
       return
     }
 
-    pos = addPlatform(pos, k.randi(maxLength))
+    const length = k.randi(maxLength)
+
+    if (!isFirst) {
+      addGem(pos, length)
+    }
+
+    pos = addPlatform(pos, length)
+    isFirst = false
+
     next()
   }
 }
