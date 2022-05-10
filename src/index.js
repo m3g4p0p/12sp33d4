@@ -1,4 +1,5 @@
 import tiles from './assets/tiles.png'
+import { fade } from './components.js'
 import { PLAYER_SPEED, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 import { groundLevel, platformGenerator } from './platforms.js'
@@ -42,6 +43,7 @@ k.scene('main', () => {
   ])
 
   k.layers([
+    'background',
     'game',
     'ui'
   ], 'game')
@@ -69,14 +71,22 @@ k.scene('main', () => {
   })
 
   k.onCollide('player', 'gem', (player, gem) => {
+    if (gem.is('fading')) {
+      return
+    }
+
     score.text += player.speed
     player.speed++
 
-    gem.destroy()
+    gem.use(fade(1))
     player.accelerate(PLAYER_SPEED)
   })
 
-  k.on('leave', 'gem', () => {
+  k.on('leave', 'gem', gem => {
+    if (gem.is('fading')) {
+      return
+    }
+
     player.speed = 1
   })
 

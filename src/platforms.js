@@ -20,6 +20,8 @@ function addGem (pos) {
     k.sprite('gem'),
     k.pos(pos),
     k.area(),
+    k.scale(),
+    k.opacity(),
     cleanLeft()
   ])
 }

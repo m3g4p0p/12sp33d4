@@ -75,3 +75,29 @@ export function cleanLeft () {
     }
   }
 }
+
+/**
+ * @param {number} time
+ * @returns {import('kaboom').Comp}
+ */
+export function fade (time) {
+  const start = k.time()
+
+  return {
+    id: 'fade',
+    require: ['opacity', 'scale'],
+    add () {
+      this.use('fading')
+    },
+    update () {
+      const faded = (k.time() - start) / time
+
+      this.opacity = 1 - faded
+      this.scale = 1 + faded
+
+      if (faded > 1) {
+        this.destroy()
+      }
+    }
+  }
+}
