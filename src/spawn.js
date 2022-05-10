@@ -1,4 +1,4 @@
-import { velocity } from './components.js'
+import { accelerate, velocity } from './components.js'
 import { k } from './init.js'
 import { TILE_SIZE } from './util.js'
 
@@ -10,12 +10,9 @@ export function spawnPlayer () {
     k.sprite('player'),
     k.pos(start),
     velocity(5),
+    accelerate(),
     k.area(),
     k.body(),
-    k.cleanup(),
-    {
-      dest: start,
-      speed: 1
-    }
+    k.cleanup()
   ])
 }

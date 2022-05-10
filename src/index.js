@@ -58,7 +58,7 @@ k.scene('main', () => {
   })
 
   k.onMouseDown(() => {
-    player.velocity(100 * Math.log(player.speed + 1))
+    player.accelerate(100)
   })
 
   k.onCollide('player', 'wall', (player, _, collision) => {
@@ -70,7 +70,9 @@ k.scene('main', () => {
   k.onCollide('player', 'gem', (player, gem) => {
     score.text += player.speed
     player.speed++
+
     gem.destroy()
+    player.accelerate(100)
   })
 
   k.on('leave', 'gem', () => {

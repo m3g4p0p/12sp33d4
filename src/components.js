@@ -29,7 +29,7 @@ export function velocity (threshold) {
   const dest = k.vec2()
 
   return {
-    id: 'accelerate',
+    id: 'velocity',
     require: ['pos'],
     velocity (value) {
       if (value === undefined) {
@@ -43,6 +43,17 @@ export function velocity (threshold) {
     },
     update () {
       this.move(this.velocity(), 0)
+    }
+  }
+}
+
+export function accelerate () {
+  return {
+    id: 'accelerate',
+    require: ['velocity'],
+    speed: 1,
+    accelerate (value) {
+      this.velocity(value * Math.log(this.speed + 1))
     }
   }
 }
