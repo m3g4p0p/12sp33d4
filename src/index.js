@@ -33,6 +33,18 @@ k.scene('main', () => {
   const spawnPlatforms = platformGenerator(
     player.pos.add(k.DOWN), 10)
 
+  const score = k.add([
+    k.text(0, { size: 16 }),
+    k.layer('ui'),
+    k.pos(10, 10),
+    k.fixed()
+  ])
+
+  k.layers([
+    'game',
+    'ui'
+  ], 'game')
+
   player.play('idle')
   k.gravity(100)
 
@@ -56,6 +68,7 @@ k.scene('main', () => {
   })
 
   k.onCollide('player', 'gem', (player, gem) => {
+    score.text += player.speed
     player.speed++
     gem.destroy()
   })
