@@ -9,6 +9,7 @@ playerTile.y++
 
 k.loadSpriteAtlas(tiles, {
   ...tileset('wall', 18, 0, 3, 3),
+  gem: tileAt(32, 10),
   player: {
     ...playerTile,
     anims: {
@@ -45,13 +46,22 @@ k.scene('main', () => {
   })
 
   k.onMouseDown(() => {
-    player.velocity(100)
+    player.velocity(100 * Math.log(player.speed + 1))
   })
 
   k.onCollide('player', 'wall', (player, _, collision) => {
     if (collision.isRight()) {
       player.velocity(0)
     }
+  })
+
+  k.onCollide('player', 'gem', (player, gem) => {
+    player.speed++
+    gem.destroy()
+  })
+
+  k.on('leave', 'gem', () => {
+    player.speed = 1
   })
 
   player.onUpdate(() => {

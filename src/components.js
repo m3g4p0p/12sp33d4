@@ -55,9 +55,12 @@ export function cleanLeft () {
     id: 'cleanLeft',
     require: ['pos'],
     update () {
-      if (k.toScreen(this.pos).x + this.width < 0) {
-        this.destroy()
+      if (k.toScreen(this.pos).x + this.width > 0) {
+        return
       }
+
+      this.destroy()
+      this.trigger('leave')
     }
   }
 }

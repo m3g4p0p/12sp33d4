@@ -13,6 +13,9 @@ export function spawnPlayer () {
     k.area(),
     k.body(),
     k.cleanup(),
-    { dest: start }
+    {
+      dest: start,
+      speed: 1
+    }
   ])
 }
