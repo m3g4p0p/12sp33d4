@@ -1,3 +1,4 @@
+import { cleanLeft } from './components.js'
 import { k } from './init.js'
 import { range, TILE_SIZE } from './util.js'
 
@@ -7,7 +8,8 @@ function addWall (pos, x, y) {
     k.sprite(`wall-${x}-${y}`),
     k.pos(pos),
     k.area(),
-    k.solid()
+    k.solid(),
+    cleanLeft()
   ]).pos.add(k.RIGHT.scale(TILE_SIZE))
 }
 

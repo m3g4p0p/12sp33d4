@@ -46,3 +46,18 @@ export function velocity (threshold) {
     }
   }
 }
+
+/**
+ * @returns {import('kaboom').Comp}
+ */
+export function cleanLeft () {
+  return {
+    id: 'cleanLeft',
+    require: ['pos'],
+    update () {
+      if (k.toScreen(this.pos).x + this.width < 0) {
+        this.destroy()
+      }
+    }
+  }
+}

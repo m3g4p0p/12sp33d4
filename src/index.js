@@ -34,7 +34,9 @@ k.scene('main', () => {
 
   player.play('idle')
   k.gravity(100)
+
   spawnPlatforms()
+  k.on('destroy', 'wall', spawnPlatforms)
 
   k.onClick(() => {
     if (player.isGrounded()) {
@@ -44,15 +46,6 @@ k.scene('main', () => {
 
   k.onMouseDown(() => {
     player.velocity(100)
-  })
-
-  k.onUpdate('wall', wall => {
-    if (k.toScreen(wall.pos).x > -wall.width) {
-      return
-    }
-
-    wall.destroy()
-    spawnPlatforms()
   })
 
   k.onCollide('player', 'wall', (player, _, collision) => {
