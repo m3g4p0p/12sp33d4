@@ -1,5 +1,5 @@
 import tiles from './assets/tiles.png'
-import { deltaPos, fade } from './components.js'
+import { fade } from './components.js'
 import { PLAYER_SPEED, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 import { groundLevel, platformGenerator } from './platforms.js'
@@ -43,6 +43,7 @@ k.scene('main', () => {
   ])
 
   let camOffset = 1
+  let airJump = null
 
   k.layers([
     'background',
@@ -67,15 +68,12 @@ k.scene('main', () => {
 
   k.onMouseDown(() => {
     player.accelerate(PLAYER_SPEED)
-  })
 
-  k.onCollide('player', 'jumpboost', (player, boost) => {
-    if (!k.isMouseDown()) {
-      return
+    if (airJump && airJump.exists()) {
+      player.jump(PLAYER_SPEED)
     }
 
-    boost.unuse('jumpboost')
-    player.jump(PLAYER_SPEED)
+    airJump = null
   })
 
   k.onCollide('player', 'wall', (player, _, collision) => {
@@ -87,6 +85,7 @@ k.scene('main', () => {
   k.onCollide('player', 'gem', (player, gem) => {
     score.text += player.speed
     player.speed++
+    airJump = gem
 
     gem.unuse('gem')
     gem.use(fade(1))
@@ -98,12 +97,12 @@ k.scene('main', () => {
   })
 
   player.onUpdate(() => {
-    const isAccelerating = player.velocity() > PLAYER_SPEED / 2
+    const velocity = player.velocity()
 
     setAnim(
       player,
       player.isGrounded()
-        ? isAccelerating
+        ? velocity > 0
           ? 'walk'
           : 'idle'
         : player.isFalling()
@@ -111,7 +110,7 @@ k.scene('main', () => {
           : 'jump'
     )
 
-    camOffset = isAccelerating
+    camOffset = velocity > PLAYER_SPEED / 2
       ? Math.min(2, camOffset + k.dt())
       : Math.max(1, camOffset - k.dt())
 

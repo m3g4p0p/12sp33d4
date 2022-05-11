@@ -21,7 +21,6 @@ function addWall (pos, x, y) {
 function addGem (start, length) {
   k.add([
     'gem',
-    'jumpboost',
     k.sprite('gem'),
     k.pos(start.add(k.vec2(
       k.randi(length),
