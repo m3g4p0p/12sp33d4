@@ -1,5 +1,5 @@
 import tiles from './assets/tiles.png'
-import { fade } from './components.js'
+import { deltaPos, fade } from './components.js'
 import { PLAYER_SPEED, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 import { groundLevel, platformGenerator } from './platforms.js'
@@ -41,6 +41,8 @@ k.scene('main', () => {
     k.pos(10, 10),
     k.fixed()
   ])
+
+  let camOffset = 1
 
   k.layers([
     'background',
@@ -96,10 +98,12 @@ k.scene('main', () => {
   })
 
   player.onUpdate(() => {
+    const isAccelerating = player.velocity() > PLAYER_SPEED / 2
+
     setAnim(
       player,
       player.isGrounded()
-        ? player.velocity() > 0
+        ? isAccelerating
           ? 'walk'
           : 'idle'
         : player.isFalling()
@@ -107,8 +111,12 @@ k.scene('main', () => {
           : 'jump'
     )
 
+    camOffset = isAccelerating
+      ? Math.min(2, camOffset + k.dt())
+      : Math.max(1, camOffset - k.dt())
+
     k.camPos(
-      k.center().x + player.pos.x - TILE_SIZE,
+      k.center().x + player.pos.x - camOffset * TILE_SIZE,
       Math.min(player.pos.y, Math.max(
         groundLevel(),
         k.camPos().y
@@ -117,10 +125,6 @@ k.scene('main', () => {
   })
 
   player.onDestroy(() => {
-    k.go('main')
-  })
-
-  k.onKeyPress('x', () => {
     k.go('main')
   })
 })
