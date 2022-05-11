@@ -55,7 +55,10 @@ k.scene('main', () => {
   k.on('destroy', 'wall', spawnPlatforms)
 
   k.onClick(() => {
-    if (player.isGrounded()) {
+    if (
+      player.isGrounded() &&
+      player.velocity() > PLAYER_SPEED / 2
+    ) {
       player.jump(PLAYER_SPEED)
     }
   })
@@ -75,7 +78,7 @@ k.scene('main', () => {
       return
     }
 
-    if (player.pos.y <= gem.pos.y && !k.isMouseDown()) {
+    if (k.isMouseDown()) {
       player.jump(PLAYER_SPEED)
     }
 
@@ -91,7 +94,7 @@ k.scene('main', () => {
       return
     }
 
-    player.speed = 1
+    player.speed = Math.max(1, player.speed - 1)
   })
 
   player.onUpdate(() => {
