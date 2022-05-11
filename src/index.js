@@ -57,6 +57,17 @@ k.scene('main', () => {
   spawnPlatforms()
   k.on('destroy', 'wall', spawnPlatforms)
 
+  k.onDraw(() => {
+    Array.from({ length: player.speed - 1 }).forEach((_, index) => {
+      k.drawRect({
+        width: 5,
+        height: 5,
+        color: k.rgb(0, (index + 1) * 32, 0),
+        pos: k.toWorld(k.vec2(10 + 6 * index, k.height() - 10))
+      })
+    })
+  })
+
   k.onClick(() => {
     if (
       player.isGrounded() &&
