@@ -67,6 +67,15 @@ k.scene('main', () => {
     player.accelerate(PLAYER_SPEED)
   })
 
+  k.onCollide('player', 'jumpboost', (player, boost) => {
+    if (!k.isMouseDown()) {
+      return
+    }
+
+    boost.unuse('jumpboost')
+    player.jump(PLAYER_SPEED)
+  })
+
   k.onCollide('player', 'wall', (player, _, collision) => {
     if (collision.isRight()) {
       player.velocity(0)
@@ -74,26 +83,15 @@ k.scene('main', () => {
   })
 
   k.onCollide('player', 'gem', (player, gem) => {
-    if (gem.is('fading')) {
-      return
-    }
-
-    if (k.isMouseDown()) {
-      player.jump(PLAYER_SPEED)
-    }
-
     score.text += player.speed
     player.speed++
 
+    gem.unuse('gem')
     gem.use(fade(1))
     player.accelerate(PLAYER_SPEED)
   })
 
-  k.on('leave', 'gem', gem => {
-    if (gem.is('fading')) {
-      return
-    }
-
+  k.on('destroy', 'gem', gem => {
     player.speed = Math.max(1, player.speed - 1)
   })
 
@@ -119,6 +117,10 @@ k.scene('main', () => {
   })
 
   player.onDestroy(() => {
+    k.go('main')
+  })
+
+  k.onKeyPress('x', () => {
     k.go('main')
   })
 })

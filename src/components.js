@@ -86,9 +86,6 @@ export function fade (time) {
   return {
     id: 'fade',
     require: ['opacity', 'scale'],
-    add () {
-      this.use('fading')
-    },
     update () {
       const faded = (k.time() - start) / time
 
