@@ -36,7 +36,7 @@ k.scene('main', () => {
     player.pos.add(k.DOWN), 10)
 
   const score = k.add([
-    k.text(0, { size: 16 }),
+    k.text(0, { size: 10 }),
     k.layer('ui'),
     k.pos(10, 10),
     k.fixed()
@@ -125,6 +125,10 @@ k.scene('main', () => {
 
   player.onDestroy(() => {
     k.go('main')
+  })
+
+  score.onUpdate(() => {
+    score.textSize = 10 + player.speed
   })
 })
 

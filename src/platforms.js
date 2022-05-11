@@ -1,6 +1,6 @@
-import { cleanLeft } from './components.js'
 import { TILE_SIZE } from './constants.js'
 import { k } from './init.js'
+import { spawnGem, spawnWall } from './spawn.js'
 import { range } from './util.js'
 
 export function groundLevel () {
@@ -8,29 +8,14 @@ export function groundLevel () {
 }
 
 function addWall (pos, x, y) {
-  return k.add([
-    'wall',
-    k.sprite(`wall-${x}-${y}`),
-    k.pos(pos),
-    k.area(),
-    k.solid(),
-    cleanLeft()
-  ]).pos.add(k.RIGHT.scale(TILE_SIZE))
+  return spawnWall(pos, x, y).pos.add(k.RIGHT.scale(TILE_SIZE))
 }
 
 function addGem (start, length) {
-  k.add([
-    'gem',
-    k.sprite('gem'),
-    k.pos(start.add(k.vec2(
-      k.randi(length),
-      k.randi(-3)
-    ).scale(TILE_SIZE))),
-    k.area(),
-    k.scale(),
-    k.opacity(),
-    cleanLeft()
-  ])
+  return spawnGem(start.add(k.vec2(
+    k.randi(length),
+    k.randi(-3)
+  ).scale(TILE_SIZE)))
 }
 
 /**
