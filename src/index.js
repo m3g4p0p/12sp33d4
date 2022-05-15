@@ -3,7 +3,7 @@ import { fade } from './components.js'
 import { PLAYER_JUMP_FORCE, PLAYER_SPEED, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 import { groundLevel, platformGenerator } from './platforms.js'
-import { spawnPlayer } from './spawn.js'
+import { spawnIndicator, spawnPlayer } from './spawn.js'
 import { tileAt, tileset } from './util.js'
 
 const playerTile = tileAt(18, 9, 6)
@@ -71,17 +71,6 @@ k.scene('main', () => {
   spawnPlatforms()
   k.on('destroy', 'wall', spawnPlatforms)
 
-  k.onDraw(() => {
-    Array.from({ length: player.speed - 1 }).forEach((_, index) => {
-      k.drawRect({
-        width: 5,
-        height: 5,
-        color: k.rgb(0, (index + 1) * 32, 0),
-        pos: k.toWorld(k.vec2(10 + 6 * index, k.height() - 10))
-      })
-    })
-  })
-
   k.onClick(() => {
     if (
       player.isGrounded() &&
@@ -123,10 +112,16 @@ k.scene('main', () => {
     gem.unuse('gem')
     gem.use(fade(1, TILE_SIZE / 2))
     player.accelerate(PLAYER_SPEED)
+    spawnIndicator()
   })
 
   k.on('destroy', 'gem', gem => {
-    player.speed = Math.max(1, player.speed - 1)
+    if (player.speed === 1) {
+      return
+    }
+
+    player.speed--
+    k.get('indicator').pop().destroy()
   })
 
   player.onUpdate(() => {

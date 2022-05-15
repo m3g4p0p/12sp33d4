@@ -65,3 +65,16 @@ export function spawnWall (pos, x, y) {
     cleanLeft()
   ])
 }
+
+export function spawnIndicator () {
+  const index = k.get('indicator').length
+
+  return k.add([
+    'indicator',
+    k.layer('ui'),
+    k.fixed(),
+    k.rect(5, 5),
+    k.pos(k.vec2(10 + 6 * index, k.height() - 10)),
+    k.color(k.rgb(0, (index + 1) * 32, 0))
+  ])
+}
