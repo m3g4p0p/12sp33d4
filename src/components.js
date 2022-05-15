@@ -95,3 +95,31 @@ export function fade (time) {
     }
   }
 }
+
+export function dynamicJump (maxTime) {
+  let jumpStart = null
+  let _jumpForce
+
+  return {
+    id: 'dynamicJump',
+    require: ['body'],
+    update () {
+      if (!jumpStart) {
+        return
+      }
+
+      if (jumpStart + maxTime > k.time()) {
+        return this.jump(_jumpForce)
+      }
+
+      jumpStart = null
+    },
+    startJump (jumpForce) {
+      jumpStart = k.time()
+      _jumpForce = jumpForce
+    },
+    stopJump () {
+      jumpStart = null
+    }
+  }
+}

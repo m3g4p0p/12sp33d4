@@ -1,6 +1,6 @@
 import tiles from './assets/tiles.png'
 import { fade } from './components.js'
-import { PLAYER_SPEED, TILE_SIZE } from './constants.js'
+import { PLAYER_JUMP_FORCE, PLAYER_SPEED, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 import { groundLevel, platformGenerator } from './platforms.js'
 import { spawnPlayer } from './spawn.js'
@@ -44,6 +44,7 @@ k.scene('main', () => {
 
   let camOffset = 1
   let airJump = null
+  const isJumping = false
 
   k.layers([
     'background',
@@ -52,6 +53,7 @@ k.scene('main', () => {
   ], 'game')
 
   player.play('idle')
+  k.camPos(player.pos)
   k.gravity(100)
 
   spawnPlatforms()
@@ -73,7 +75,7 @@ k.scene('main', () => {
       player.isGrounded() &&
       player.velocity() > PLAYER_SPEED / 2
     ) {
-      player.jump(PLAYER_SPEED)
+      player.startJump(PLAYER_JUMP_FORCE)
     }
   })
 
@@ -81,10 +83,14 @@ k.scene('main', () => {
     player.accelerate(PLAYER_SPEED)
 
     if (airJump && airJump.exists()) {
-      player.jump(PLAYER_SPEED)
+      player.startJump(PLAYER_JUMP_FORCE)
     }
 
     airJump = null
+  })
+
+  k.onMouseRelease(() => {
+    player.stopJump()
   })
 
   k.onCollide('player', 'wall', (player, _, collision) => {
@@ -122,7 +128,7 @@ k.scene('main', () => {
     )
 
     camOffset = velocity > PLAYER_SPEED / 2
-      ? Math.min(2, camOffset + k.dt())
+      ? Math.min(5, camOffset + k.dt())
       : Math.max(1, camOffset - k.dt())
 
     k.camPos(
