@@ -53,7 +53,7 @@ k.scene('main', () => {
     k.fixed()
   ])
 
-  const maxOffset = k.width() / TILE_SIZE
+  const maxOffset = k.center().x / TILE_SIZE
   let camOffset = 5
   let airJump = null
 
