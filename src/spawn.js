@@ -1,4 +1,4 @@
-import { accelerate, cleanLeft, dynamicJump, velocity } from './components.js'
+import { accelerate, bounce, cleanLeft, dynamicJump, velocity } from './components.js'
 import { TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 
@@ -26,6 +26,8 @@ export function spawnGem (pos) {
     k.area(),
     k.scale(),
     k.opacity(),
+    k.body({ solid: false }),
+    bounce(k.randi(40, 50)),
     cleanLeft()
   ])
 }

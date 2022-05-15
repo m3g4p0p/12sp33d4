@@ -124,3 +124,22 @@ export function dynamicJump (maxTime) {
     }
   }
 }
+
+export function bounce (jumpForce) {
+  let pos
+
+  return {
+    id: 'bounce',
+    require: ['body', 'pos'],
+    add () {
+      pos = this.pos.clone()
+    },
+    update () {
+      const deltaY = this.pos.y - pos.y
+
+      if (deltaY >= 0) {
+        this.jump(jumpForce + deltaY)
+      }
+    }
+  }
+}
