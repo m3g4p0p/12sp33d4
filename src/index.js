@@ -29,6 +29,17 @@ function setAnim (obj, anim, options) {
   }
 }
 
+k.scene('start', () => {
+  k.add([
+    k.text('Tap to start', { size: 10 }),
+    k.pos(10, 10)
+  ])
+
+  k.onMouseRelease(() => {
+    k.go('main')
+  })
+})
+
 k.scene('main', () => {
   const player = spawnPlayer()
 
@@ -42,9 +53,9 @@ k.scene('main', () => {
     k.fixed()
   ])
 
-  let camOffset = 1
+  const maxOffset = k.width() / TILE_SIZE
+  let camOffset = 5
   let airJump = null
-  const isJumping = false
 
   k.layers([
     'background',
@@ -128,8 +139,8 @@ k.scene('main', () => {
     )
 
     camOffset = velocity > PLAYER_SPEED / 2
-      ? Math.min(5, camOffset + k.dt())
-      : Math.max(1, camOffset - k.dt())
+      ? Math.min(maxOffset, camOffset + k.dt())
+      : camOffset - k.dt()
 
     k.camPos(
       k.center().x + player.pos.x - camOffset * TILE_SIZE,
@@ -141,7 +152,7 @@ k.scene('main', () => {
   })
 
   player.onDestroy(() => {
-    k.go('main')
+    k.go('start')
   })
 
   score.onUpdate(() => {
@@ -149,4 +160,4 @@ k.scene('main', () => {
   })
 })
 
-k.go('main')
+k.go('start')
