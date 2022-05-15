@@ -1,4 +1,4 @@
-import { accelerate, bounce, cleanLeft, dynamicJump, velocity } from './components.js'
+import { accelerate, bounce, cleanLeft, dynamicJump, flicker, velocity } from './components.js'
 import { TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 
@@ -19,7 +19,7 @@ export function spawnPlayer () {
 }
 
 export function spawnGem (pos) {
-  k.add([
+  const gem = k.add([
     'gem',
     k.sprite('gem'),
     k.pos(pos),
@@ -30,6 +30,29 @@ export function spawnGem (pos) {
     bounce(k.randi(40, 50)),
     cleanLeft()
   ])
+
+  const glow = k.add([
+    k.circle(TILE_SIZE / 2),
+    k.color(k.YELLOW),
+    k.opacity(),
+    k.scale(),
+    k.layer('effects'),
+    k.pos(gem.pos),
+    k.follow(gem, TILE_SIZE / 2),
+    flicker(0.2)
+  ])
+
+  glow.onUpdate(() => {
+    if (gem.c('fade')) {
+      glow.destroy()
+    }
+  })
+
+  gem.onDestroy(() => {
+    glow.destroy()
+  })
+
+  return gem
 }
 
 export function spawnWall (pos, x, y) {

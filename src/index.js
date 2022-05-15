@@ -54,11 +54,12 @@ k.scene('main', () => {
   ])
 
   const maxOffset = k.center().x / TILE_SIZE
-  let camOffset = 5
+  let camOffset = maxOffset
   let airJump = null
 
   k.layers([
     'background',
+    'effects',
     'game',
     'ui'
   ], 'game')

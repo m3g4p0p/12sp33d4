@@ -143,3 +143,29 @@ export function bounce (jumpForce) {
     }
   }
 }
+
+export function flicker (amount) {
+  let currentValue = 0
+  let targetValue = 0
+
+  return {
+    id: 'flicker',
+    require: ['opacity', 'scale', 'pos'],
+    update () {
+      if (targetValue === currentValue) {
+        targetValue = k.rand(-1, 1) * amount
+      }
+
+      const remaining = targetValue - currentValue
+
+      currentValue += Math.min(
+        k.dt() * 2,
+        Math.abs(remaining)
+      ) * Math.sign(remaining)
+
+      this.opacity = amount + currentValue
+      this.scale = 1 - currentValue
+      this.pos = this.pos.sub(currentValue / 2)
+    }
+  }
+}
