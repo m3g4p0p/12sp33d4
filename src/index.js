@@ -98,6 +98,10 @@ k.scene('main', () => {
     player.stopJump()
   })
 
+  k.onKeyPress('x', () => {
+    player.destroy()
+  })
+
   k.onCollide('player', 'wall', (player, _, collision) => {
     if (collision.isRight()) {
       player.velocity(0)
@@ -110,7 +114,7 @@ k.scene('main', () => {
     airJump = gem
 
     gem.unuse('gem')
-    gem.use(fade(1))
+    gem.use(fade(1, TILE_SIZE / 2))
     player.accelerate(PLAYER_SPEED)
   })
 

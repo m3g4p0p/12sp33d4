@@ -77,17 +77,18 @@ export function cleanLeft () {
  * @param {number} time
  * @returns {import('kaboom').Comp}
  */
-export function fade (time) {
+export function fade (time, offset) {
   const start = k.time()
 
   return {
     id: 'fade',
-    require: ['opacity', 'scale'],
+    require: ['opacity', 'scale', 'pos'],
     update () {
       const faded = (k.time() - start) / time
 
       this.opacity = 1 - faded
       this.scale = 1 + faded
+      this.pos = this.pos.sub(offset * k.dt() / time)
 
       if (faded > 1) {
         this.destroy()
