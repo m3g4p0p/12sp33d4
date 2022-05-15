@@ -82,13 +82,19 @@ k.scene('main', () => {
     })
   })
 
+  k.onClick(() => {
+    if (
+      player.isGrounded() &&
+      player.velocity() > PLAYER_SPEED / 2
+    ) {
+      player.startJump(PLAYER_JUMP_FORCE)
+    }
+  })
+
   k.onMouseDown(() => {
     player.accelerate(PLAYER_SPEED)
 
-    if ((airJump && airJump.exists()) || (
-      player.isGrounded() &&
-      player.velocity() > PLAYER_SPEED / 2
-    )) {
+    if (airJump && airJump.exists()) {
       player.startJump(PLAYER_JUMP_FORCE)
     }
 

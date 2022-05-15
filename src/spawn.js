@@ -42,7 +42,7 @@ export function spawnGem (pos) {
     flicker(0.2)
   ])
 
-  glow.onUpdate(() => {
+  gem.onUpdate(() => {
     if (gem.c('fade')) {
       glow.destroy()
     }
