@@ -21,6 +21,7 @@ export function spawnPlayer () {
 export function spawnGem (pos) {
   const gem = k.add([
     'gem',
+    'booster',
     k.sprite('gem'),
     k.pos(pos),
     k.area(),

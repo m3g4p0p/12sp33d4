@@ -56,7 +56,7 @@ k.scene('main', () => {
 
   const maxOffset = k.center().x / TILE_SIZE
   let camOffset = maxOffset
-  let airJump = null
+  let activeBooster = null
 
   k.layers([
     'background',
@@ -73,14 +73,14 @@ k.scene('main', () => {
   k.on('destroy', 'wall', spawnPlatforms)
 
   k.onClick(() => {
-    if ((airJump && airJump.exists()) || (
+    if (activeBooster || (
       player.isGrounded() &&
       player.velocity() > PLAYER_SPEED / 2
     )) {
       player.startJump(PLAYER_JUMP_FORCE)
     }
 
-    airJump = null
+    activeBooster = null
   })
 
   k.onMouseDown(() => {
@@ -101,24 +101,34 @@ k.scene('main', () => {
     }
   })
 
-  k.onCollide('player', 'gem', (player, gem) => {
+  k.onCollide('gem', 'player', gem => {
     score.text += player.speed
-    player.speed++
-    airJump = gem
 
     gem.unuse('gem')
     gem.use(fade(1, TILE_SIZE / 2))
+  })
+
+  k.onCollide('booster', 'player', booster => {
+    activeBooster = booster
+    player.speed++
+
     player.accelerate(PLAYER_SPEED)
     spawnIndicator()
   })
 
-  k.on('destroy', 'gem', gem => {
+  k.on('destroy', 'gem', () => {
     if (player.speed === 1) {
       return
     }
 
     player.speed--
     k.get('indicator').pop().destroy()
+  })
+
+  k.on('destroy', 'booster', booster => {
+    if (booster === activeBooster) {
+      activeBooster = null
+    }
   })
 
   player.onUpdate(() => {
