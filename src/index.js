@@ -11,6 +11,7 @@ playerTile.y++
 
 k.loadSpriteAtlas(tiles, {
   ...tileset('wall', 18, 0, 3, 3),
+  ...tileset('plant', 0, 1, 4, 2),
   gem: tileAt(32, 10),
   player: {
     ...playerTile,

@@ -27,7 +27,7 @@ export function tileset (name, x, y, width, height) {
   return ranges(height, width).reduce((result, row, iY) => ({
     ...result,
     ...Object.fromEntries(row.map(iX => [
-      `${name}-${iY}-${iX}`,
+      `${name}-${iX}-${iY}`,
       tileAt(x + iX, y + iY)
     ]))
   }), {})

@@ -1,13 +1,17 @@
 import { TILE_SIZE } from './constants.js'
 import { k } from './init.js'
-import { spawnGem, spawnWall } from './spawn.js'
+import { spawnGem, spawnPlant, spawnWall } from './spawn.js'
 import { range } from './util.js'
 
 export function groundLevel () {
   return Math.max(...k.get('wall').map(wall => wall.pos.y))
 }
 
-function addWall (pos, x, y) {
+function addGround (pos, x, y) {
+  if (k.chance(0.33)) {
+    spawnPlant(pos.add(k.UP.scale(TILE_SIZE)))
+  }
+
   return spawnWall(pos, x, y).pos.add(k.RIGHT.scale(TILE_SIZE))
 }
 
@@ -25,10 +29,10 @@ function addGem (start, length) {
  */
 function addPlatform (start, length) {
   const pos = range(length - 2).reduce(pos => {
-    return addWall(pos, 0, 1)
-  }, addWall(start, 0, 0))
+    return addGround(pos, 1, 0)
+  }, addGround(start, 0, 0))
 
-  return addWall(pos, 0, 2).add(
+  return addGround(pos, 2, 0).add(
     k.randi(2, 3) * TILE_SIZE,
     k.randi(-2, 2) * TILE_SIZE
   )
@@ -50,7 +54,6 @@ export function platformGenerator (pos, maxLength) {
 
     pos = addPlatform(pos, length)
     isFirst = false
-
     next()
   }
 }

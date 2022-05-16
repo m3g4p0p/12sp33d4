@@ -78,3 +78,12 @@ export function spawnIndicator () {
     k.color(k.rgb(0, (index + 1) * 32, 0))
   ])
 }
+
+export function spawnPlant (pos) {
+  return k.add([
+    k.sprite(`plant-${k.randi(4)}-${k.randi(1, 2)}`),
+    k.layer('background'),
+    k.pos(pos),
+    k.opacity(k.rand(0.5))
+  ])
+}
