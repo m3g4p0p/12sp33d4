@@ -73,22 +73,18 @@ k.scene('main', () => {
   k.on('destroy', 'wall', spawnPlatforms)
 
   k.onClick(() => {
-    if (
+    if ((airJump && airJump.exists()) || (
       player.isGrounded() &&
       player.velocity() > PLAYER_SPEED / 2
-    ) {
-      player.startJump(PLAYER_JUMP_FORCE)
-    }
-  })
-
-  k.onMouseDown(() => {
-    player.accelerate(PLAYER_SPEED)
-
-    if (airJump && airJump.exists()) {
+    )) {
       player.startJump(PLAYER_JUMP_FORCE)
     }
 
     airJump = null
+  })
+
+  k.onMouseDown(() => {
+    player.accelerate(PLAYER_SPEED)
   })
 
   k.onMouseRelease(() => {
