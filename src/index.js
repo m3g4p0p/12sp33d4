@@ -1,10 +1,11 @@
-import tiles from './assets/tiles.png'
 import { fade } from './components.js'
 import { PLAYER_JUMP_FORCE, PLAYER_SPEED, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 import { groundLevel, platformGenerator } from './platforms.js'
 import { spawnIndicator, spawnPlayer, spawnScore } from './spawn.js'
 import { tileAt, tileset } from './tilemath.js'
+import { requestFullscreen, shake } from './util.js'
+import tiles from './assets/tiles.png'
 
 const playerTile = tileAt(18, 9, 6)
 playerTile.y++
@@ -30,6 +31,15 @@ function setAnim (obj, anim, options) {
   }
 }
 
+function addUiText (text, x, y) {
+  return k.add([
+    k.text(text, { size: 10 }),
+    k.layer('ui'),
+    k.pos(x, y),
+    k.fixed()
+  ])
+}
+
 k.scene('start', () => {
   k.add([
     k.text('Tap to start', { size: 10 }),
@@ -37,6 +47,7 @@ k.scene('start', () => {
   ])
 
   k.onMouseRelease(() => {
+    requestFullscreen()
     k.go('main')
   })
 })
@@ -47,15 +58,13 @@ k.scene('main', () => {
   const spawnPlatforms = platformGenerator(
     player.pos.add(k.DOWN), 10)
 
-  const score = k.add([
-    k.text(0, { size: 10 }),
-    k.layer('ui'),
-    k.pos(10, 10),
-    k.fixed()
-  ])
+  const scoreLabel = addUiText('SCORE', 10, 10)
+  const score = addUiText(0, scoreLabel.width + 20, 10)
+  const speedLabel = addUiText('SPEED', 10, k.height() - 20)
+  const indicatorOffset = k.vec2(speedLabel.width + 20, speedLabel.pos.y)
+  const maxCamOffset = k.center().x / TILE_SIZE
 
-  const maxOffset = k.center().x / TILE_SIZE
-  let camOffset = maxOffset
+  let camOffset = maxCamOffset
   let activeBooster = null
 
   k.layers([
@@ -70,6 +79,7 @@ k.scene('main', () => {
   k.gravity(100)
 
   spawnPlatforms()
+  spawnIndicator(indicatorOffset)
   k.on('destroy', 'wall', spawnPlatforms)
 
   k.onClick(() => {
@@ -114,16 +124,13 @@ k.scene('main', () => {
     player.speed++
 
     player.accelerate(PLAYER_SPEED)
-    spawnIndicator()
+    spawnIndicator(indicatorOffset)
+    shake(6)
   })
 
   k.on('destroy', 'gem', () => {
-    if (player.speed === 1) {
-      return
-    }
-
-    player.speed--
-    k.get('indicator').pop().destroy()
+    player.speed = Math.ceil(player.speed / 2)
+    k.get('indicator').splice(player.speed).forEach(k.destroy)
   })
 
   k.on('destroy', 'booster', booster => {
@@ -147,7 +154,7 @@ k.scene('main', () => {
     )
 
     camOffset = velocity > PLAYER_SPEED / 2
-      ? Math.min(maxOffset, camOffset + k.dt())
+      ? Math.min(maxCamOffset, camOffset + k.dt())
       : camOffset - k.dt()
 
     k.camPos(
@@ -160,6 +167,7 @@ k.scene('main', () => {
   })
 
   player.onDestroy(() => {
+    shake(12)
     k.go('start')
   })
 

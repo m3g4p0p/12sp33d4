@@ -69,15 +69,15 @@ export function spawnWall (pos, x, y) {
   ])
 }
 
-export function spawnIndicator () {
+export function spawnIndicator (offset) {
   const index = k.get('indicator').length
 
   return k.add([
     'indicator',
     k.layer('ui'),
     k.fixed(),
-    k.rect(5, 5),
-    k.pos(k.vec2(10 + 6 * index, k.height() - 10)),
+    k.rect(8, 8),
+    k.pos(k.vec2(10 * index, 1).add(offset)),
     k.color(k.rgb(0, (index + 1) * 32, 0))
   ])
 }
