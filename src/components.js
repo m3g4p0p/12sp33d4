@@ -1,6 +1,5 @@
-import { TILE_SIZE } from './constants.js'
 import { k } from './init.js'
-import { thresh } from './util.js'
+import { thresh } from './tilemath.js'
 
 /**
  * @returns {import("kaboom").Comp}
@@ -169,21 +168,6 @@ export function flicker (amount) {
       this.opacity = amount + currentValue
       this.scale = 1 - currentValue
       this.pos = this.pos.sub(currentValue / 2)
-    }
-  }
-}
-
-export function toCenter () {
-  return {
-    id: 'toCenter',
-    require: ['follow'],
-    update () {
-      const { obj } = this.follow
-
-      this.pos = this.pos.add(
-        obj.width / 4,
-        obj.height / 4
-      )
     }
   }
 }

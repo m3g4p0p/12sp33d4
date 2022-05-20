@@ -4,7 +4,7 @@ import { PLAYER_JUMP_FORCE, PLAYER_SPEED, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 import { groundLevel, platformGenerator } from './platforms.js'
 import { spawnIndicator, spawnPlayer, spawnScore } from './spawn.js'
-import { tileAt, tileset } from './util.js'
+import { tileAt, tileset } from './tilemath.js'
 
 const playerTile = tileAt(18, 9, 6)
 playerTile.y++
