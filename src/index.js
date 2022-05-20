@@ -3,7 +3,7 @@ import { fade } from './components.js'
 import { PLAYER_JUMP_FORCE, PLAYER_SPEED, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 import { groundLevel, platformGenerator } from './platforms.js'
-import { spawnIndicator, spawnPlayer } from './spawn.js'
+import { spawnIndicator, spawnPlayer, spawnScore } from './spawn.js'
 import { tileAt, tileset } from './util.js'
 
 const playerTile = tileAt(18, 9, 6)
@@ -104,8 +104,9 @@ k.scene('main', () => {
   k.onCollide('gem', 'player', gem => {
     score.text += player.speed
 
+    spawnScore(player.speed, gem.pos)
     gem.unuse('gem')
-    gem.use(fade(1, TILE_SIZE / 2))
+    gem.use(fade())
   })
 
   k.onCollide('booster', 'player', booster => {

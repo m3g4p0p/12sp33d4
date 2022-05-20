@@ -1,3 +1,4 @@
+import { TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 import { thresh } from './util.js'
 
@@ -77,12 +78,12 @@ export function cleanLeft () {
  * @param {number} time
  * @returns {import('kaboom').Comp}
  */
-export function fade (time, offset) {
+export function fade (time = 1, upScale = 1) {
   const start = k.time()
 
   return {
     id: 'fade',
-    require: ['opacity', 'scale', 'pos'],
+    require: ['opacity', 'scale'],
     add () {
       this.trigger('fade')
     },
@@ -90,8 +91,7 @@ export function fade (time, offset) {
       const faded = (k.time() - start) / time
 
       this.opacity = 1 - faded
-      this.scale = 1 + faded
-      this.pos = this.pos.sub(offset * k.dt() / time)
+      this.scale = 1 + faded * upScale
 
       if (faded > 1) {
         this.destroy()
@@ -169,6 +169,21 @@ export function flicker (amount) {
       this.opacity = amount + currentValue
       this.scale = 1 - currentValue
       this.pos = this.pos.sub(currentValue / 2)
+    }
+  }
+}
+
+export function toCenter () {
+  return {
+    id: 'toCenter',
+    require: ['follow'],
+    update () {
+      const { obj } = this.follow
+
+      this.pos = this.pos.add(
+        obj.width / 4,
+        obj.height / 4
+      )
     }
   }
 }
