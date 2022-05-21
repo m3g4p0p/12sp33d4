@@ -123,12 +123,25 @@ k.scene('main', () => {
     activeBooster = booster
     player.speed++
 
+    booster.unuse('booster')
     player.accelerate(PLAYER_SPEED)
     spawnIndicator(indicatorOffset)
     shake(6)
   })
 
-  k.on('destroy', 'gem', () => {
+  k.on('update', 'gem', gem => {
+    if (
+      player.worldArea().p1.x <
+      gem.worldArea().p2.x
+    ) {
+      return
+    }
+
+    gem.unuse('gem')
+    gem.use(fade(1, -1))
+  })
+
+  k.on('destroy', 'booster', () => {
     player.speed = Math.ceil(player.speed / 2)
     k.get('indicator').splice(player.speed).forEach(k.destroy)
   })
