@@ -1,7 +1,7 @@
 import { k } from './init.js'
 
 export function requestFullscreen () {
-  if (document.fullscreenElement) {
+  if (document.fullscreenElement || !k.isTouch()) {
     return
   }
 
