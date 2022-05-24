@@ -171,3 +171,20 @@ export function flicker (amount) {
     }
   }
 }
+
+export function lagBehind (target, maxDist = target.width) {
+  return {
+    id: 'lagBehind',
+    require: ['pos'],
+    update () {
+      const dist = this.pos.dist(target.pos)
+      const lag = target.pos.sub(this.pos)
+
+      this.pos = this.pos.add(
+        maxDist > dist
+          ? lag.scale(k.dt() * maxDist)
+          : lag.unit().scale(dist - maxDist)
+      )
+    }
+  }
+}
