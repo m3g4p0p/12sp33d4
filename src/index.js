@@ -101,10 +101,6 @@ k.scene('main', () => {
     player.stopJump()
   })
 
-  k.onKeyPress('x', () => {
-    player.destroy()
-  })
-
   k.onCollide('player', 'wall', (player, _, collision) => {
     if (collision.isRight()) {
       player.velocity(0)
@@ -186,6 +182,18 @@ k.scene('main', () => {
 
   score.onUpdate(() => {
     score.textSize = 10 + player.speed
+  })
+
+  if (!DEVELOP) {
+    return
+  }
+
+  k.onKeyPress('x', () => {
+    player.destroy()
+  })
+
+  k.onKeyPress('y', () => {
+    player.jump(PLAYER_JUMP_FORCE)
   })
 })
 

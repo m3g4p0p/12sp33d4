@@ -1,8 +1,14 @@
 {
   "name": "asterospeed",
   "type": "module",
+  "standard": {
+    "env": {
+      "browser": true
+    },
+    "globals": ["DEVELOP"]
+  },
   "scripts": {
-    "serve": "webpack-dev-server",
+    "serve": "webpack-dev-server --env develop",
     "build": "webpack"
   },
   "dependencies": {

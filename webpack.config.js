@@ -1,9 +1,9 @@
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import webpack from 'webpack'
 
-export default {
+export default ({ develop = false }) => ({
   entry: './src/index.js',
-  mode: 'development',
+  mode: develop ? 'development' : 'production',
   devtool: 'inline-source-map',
   plugins: [
     new HtmlWebpackPlugin({
@@ -11,7 +11,7 @@ export default {
       favicon: 'src/assets/favicon.ico'
     }),
     new webpack.DefinePlugin({
-      DEVELOP: JSON.stringify(true)
+      DEVELOP: JSON.stringify(develop)
     })
   ],
   module: {
@@ -26,4 +26,4 @@ export default {
     host: '0.0.0.0',
     port: 5500
   }
-}
+})
