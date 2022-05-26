@@ -11,12 +11,29 @@ function tilePos (pos, delta) {
   return pos.add(delta.scale(TILE_SIZE))
 }
 
-function addGround (pos, x, y) {
+function boulderChance (count) {
+  return k.chance(0.33 - 0.33 / 1.05 ** count)
+}
+
+function addSubsoil (pos, tileX) {
+  const spriteName = tileX === 1
+    ? 'wall-1-2'
+    : `bevel-${tileX / 2}-1`
+
+  return spawnWall(tilePos(pos, k.DOWN), spriteName)
+}
+
+function addGround (pos, tileX, tileY) {
+  const spriteName = `wall-${tileX}-${tileY}`
+  const wall = spawnWall(pos, spriteName)
+
+  addSubsoil(pos, tileX)
+
   if (k.chance(0.33)) {
     spawnPlant(tilePos(pos, k.UP))
   }
 
-  return tilePos(spawnWall(pos, x, y).pos, k.RIGHT)
+  return tilePos(wall.pos, k.RIGHT)
 }
 
 function addGem (start, length) {
@@ -32,13 +49,9 @@ function addBoulder (pos, exclude) {
   }
 
   const delta = k.vec2(0, k.randi(-2, -5))
-  const boulder = spawnWall(tilePos(pos, delta), 1, 1)
+  const boulder = spawnWall(tilePos(pos, delta), 'wall-1-1')
 
   exclude.push(boulder.pos.x + TILE_SIZE)
-}
-
-function boulderChance (count) {
-  return k.chance(0.33 - 0.33 / 1.05 ** count)
 }
 
 /**

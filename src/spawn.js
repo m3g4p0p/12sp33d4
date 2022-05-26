@@ -57,10 +57,10 @@ export function spawnGem (pos, jumpForce) {
   return gem
 }
 
-export function spawnWall (pos, x, y) {
+export function spawnWall (pos, spriteName) {
   return k.add([
     'wall',
-    k.sprite(`wall-${x}-${y}`),
+    k.sprite(spriteName),
     k.origin('center'),
     k.pos(pos),
     k.area(),
