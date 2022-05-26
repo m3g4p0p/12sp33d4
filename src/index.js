@@ -197,6 +197,11 @@ k.scene('main', () => {
     player.jump(PLAYER_JUMP_FORCE)
   })
 
+  k.onKeyPress('<', () => {
+    player.speed++
+    spawnIndicator(indicatorOffset)
+  })
+
   window.player = player
 })
 

@@ -26,13 +26,19 @@ function addGem (start, length) {
   return spawnGem(tilePos(start, delta), jumpForce)
 }
 
-function addBoulder (pos) {
-  const delta = k.vec2(0, k.randi(-1, -4))
-  return spawnWall(tilePos(pos, delta), 1, 1)
+function addBoulder (pos, exclude) {
+  if (exclude.includes(pos.x)) {
+    return
+  }
+
+  const delta = k.vec2(0, k.randi(-2, -5))
+  const boulder = spawnWall(tilePos(pos, delta), 1, 1)
+
+  exclude.push(boulder.pos.x + TILE_SIZE)
 }
 
 function boulderChance (count) {
-  return k.chance(0.5 - 0.5 / 1.1 ** count)
+  return k.chance(0.33 - 0.33 / 1.05 ** count)
 }
 
 /**
@@ -42,17 +48,12 @@ function boulderChance (count) {
  * @returns {import('kaboom').Vec2}
  */
 function addPlatform (start, length, count) {
-  const gemX = count === 0 ? -Infinity : addGem(start, length).pos.x
-  let boulderX = -Infinity
+  const gem = count > 0 ? addGem(start, length) : null
+  const noBoulder = gem ? [gem.pos.x] : []
 
   const pos = range(length - 2).reduce(pos => {
-    if (
-      pos.x !== gemX &&
-      pos.x > boulderX + TILE_SIZE &&
-      boulderChance(count)
-    ) {
-      addBoulder(pos)
-      boulderX = pos.x
+    if (boulderChance(count)) {
+      addBoulder(pos, noBoulder)
     }
 
     return addGround(pos, 1, 0)
