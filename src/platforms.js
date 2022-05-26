@@ -29,6 +29,10 @@ function addBoulder (pos) {
   return spawnWall(tilePos(pos, delta), 1, 1)
 }
 
+function boulderChance (count) {
+  return k.chance(0.5 - 0.5 / 1.1 ** count)
+}
+
 /**
  * @param {import('kaboom').Vec2} start
  * @param {number} length
@@ -39,7 +43,7 @@ function addPlatform (start, length, count) {
   const gemPosX = count === 0 ? -1 : addGem(start, length).pos.x
 
   const pos = range(length - 2).reduce(pos => {
-    if (pos.x !== gemPosX && k.chance(count / 100)) {
+    if (pos.x !== gemPosX && boulderChance(count)) {
       addBoulder(pos)
     }
 
