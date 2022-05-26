@@ -69,6 +69,28 @@ export function spawnWall (pos, spriteName) {
   ])
 }
 
+export function spawnPlant (pos) {
+  return k.add([
+    k.sprite(`plant-${k.randi(4)}-${k.randi(1, 2)}`),
+    k.layer('background'),
+    k.origin('center'),
+    k.pos(pos),
+    k.opacity(k.rand(0.5))
+  ])
+}
+
+export function spawnSword (pos) {
+  return k.add([
+    'sword',
+    k.sprite(`sword-${k.randi(4)}-0`),
+    k.origin('center'),
+    k.pos(pos),
+    k.z(-1),
+    k.area(),
+    cleanLeft()
+  ])
+}
+
 export function spawnIndicator (offset) {
   const index = k.get('indicator').length
 
@@ -79,16 +101,6 @@ export function spawnIndicator (offset) {
     k.rect(8, 8),
     k.pos(k.vec2(10 * index, 1).add(offset)),
     k.color(k.rgb(0, (index + 1) * 32, 0))
-  ])
-}
-
-export function spawnPlant (pos) {
-  return k.add([
-    k.sprite(`plant-${k.randi(4)}-${k.randi(1, 2)}`),
-    k.layer('background'),
-    k.origin('center'),
-    k.pos(pos),
-    k.opacity(k.rand(0.5))
   ])
 }
 

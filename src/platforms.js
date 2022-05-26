@@ -1,6 +1,6 @@
 import { TILE_SIZE } from './constants.js'
 import { k } from './init.js'
-import { spawnGem, spawnPlant, spawnWall } from './spawn.js'
+import { spawnGem, spawnPlant, spawnSword, spawnWall } from './spawn.js'
 import { range } from './tilemath.js'
 
 export function groundLevel () {
@@ -31,6 +31,8 @@ function addGround (pos, tileX, tileY) {
 
   if (k.chance(0.33)) {
     spawnPlant(tilePos(pos, k.UP))
+  } else if (k.chance(0.2)) {
+    spawnSword(tilePos(pos, k.UP))
   }
 
   return tilePos(wall.pos, k.RIGHT)

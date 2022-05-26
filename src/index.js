@@ -14,6 +14,7 @@ k.loadSpriteAtlas(tiles, {
   ...tileset('wall', 18, 0, 3, 3),
   ...tileset('bevel', 20, 3, 2, 2),
   ...tileset('plant', 0, 1, 4, 2),
+  ...tileset('sword', 32, 7, 5, 1),
   gem: tileAt(32, 10),
   player: {
     ...playerTile,
@@ -67,6 +68,7 @@ k.scene('main', () => {
 
   let camOffset = maxCamOffset
   let activeBooster = null
+  let wieldedSword = null
 
   k.layers([
     'background',
@@ -89,6 +91,11 @@ k.scene('main', () => {
       player.velocity() > PLAYER_SPEED / 2
     )) {
       player.startJump(PLAYER_JUMP_FORCE)
+    }
+
+    if (wieldedSword) {
+      player.spin(1000)
+
     }
 
     activeBooster = null
@@ -124,6 +131,19 @@ k.scene('main', () => {
     player.accelerate(PLAYER_SPEED)
     spawnIndicator(indicatorOffset)
     shake(6)
+  })
+
+  k.onCollide('sword', 'player', sword => {
+    if (wieldedSword) {
+      wieldedSword.destroy()
+    }
+
+    wieldedSword = sword
+    // sword.origin = 'left'
+    sword.use(k.follow(player, k.vec2(
+      TILE_SIZE / 2,
+      TILE_SIZE / -8
+    )))
   })
 
   k.on('update', 'gem', gem => {
