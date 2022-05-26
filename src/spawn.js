@@ -1,4 +1,4 @@
-import { accelerate, bounce, cleanLeft, dynamicJump, fade, flicker, velocity } from './components.js'
+import { accelerate, bounce, cleanLeft, dynamicJump, fade, flicker, spinning, velocity } from './components.js'
 import { TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 
@@ -13,8 +13,10 @@ export function spawnPlayer () {
     velocity(5),
     accelerate(),
     dynamicJump(0.5),
+    spinning(),
     k.area(),
     k.body(),
+    k.rotate(),
     k.cleanup()
   ])
 }

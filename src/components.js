@@ -188,3 +188,31 @@ export function lagBehind (target, maxDist = target.width) {
     }
   }
 }
+
+export function spinning () {
+  let _speed = null
+
+  return {
+    id: 'spinning',
+    require: ['rotate'],
+    spin (speed) {
+      if (_speed === null) {
+        _speed = speed
+      }
+    },
+    update () {
+      if (_speed === null) {
+        return
+      }
+
+      const nextAngle = this.angle + k.dt() * _speed
+
+      if (nextAngle < 360) {
+        this.angle = nextAngle
+      } else {
+        this.angle = 0
+        _speed = null
+      }
+    }
+  }
+}
