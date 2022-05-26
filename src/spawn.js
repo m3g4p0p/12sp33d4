@@ -89,6 +89,10 @@ export function spawnSword (pos) {
     k.pos(pos),
     k.z(-1),
     k.area(),
+    k.scale(),
+    k.rotate(),
+    k.opacity(),
+    spinning(),
     cleanLeft()
   ])
 }

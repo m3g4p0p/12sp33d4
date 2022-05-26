@@ -216,3 +216,16 @@ export function spinning () {
     }
   }
 }
+
+export function followSpin (target, offset) {
+  return {
+    id: 'followSpin',
+    require: ['rotate'],
+    add () {
+      this.use(k.follow(target, offset))
+    },
+    update () {
+      this.angle = target.angle
+    }
+  }
+}

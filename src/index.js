@@ -1,4 +1,4 @@
-import { fade } from './components.js'
+import { fade, followSpin } from './components.js'
 import { PLAYER_JUMP_FORCE, PLAYER_SPEED, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 import { groundLevel, platformGenerator } from './platforms.js'
@@ -95,7 +95,6 @@ k.scene('main', () => {
 
     if (wieldedSword) {
       player.spin(1000)
-
     }
 
     activeBooster = null
@@ -139,11 +138,15 @@ k.scene('main', () => {
     }
 
     wieldedSword = sword
-    // sword.origin = 'left'
-    sword.use(k.follow(player, k.vec2(
+
+    sword.use(followSpin(player, k.vec2(
       TILE_SIZE / 2,
       TILE_SIZE / -8
     )))
+
+    sword.use(k.timer(5, () => {
+      sword.use(fade(0.5))
+    }))
   })
 
   k.on('update', 'gem', gem => {
