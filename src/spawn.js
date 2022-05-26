@@ -19,7 +19,7 @@ export function spawnPlayer () {
   ])
 }
 
-export function spawnGem (pos) {
+export function spawnGem (pos, jumpForce) {
   const gem = k.add([
     'gem',
     'booster',
@@ -30,7 +30,7 @@ export function spawnGem (pos) {
     k.scale(),
     k.opacity(),
     k.body({ solid: false }),
-    bounce(k.randi(40, 50)),
+    bounce(jumpForce),
     cleanLeft()
   ])
 

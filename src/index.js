@@ -193,8 +193,11 @@ k.scene('main', () => {
   })
 
   k.onKeyPress('y', () => {
+    player.accelerate(PLAYER_SPEED)
     player.jump(PLAYER_JUMP_FORCE)
   })
+
+  window.player = player
 })
 
 k.go('start')

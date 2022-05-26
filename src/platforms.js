@@ -21,7 +21,9 @@ function addGround (pos, x, y) {
 
 function addGem (start, length) {
   const delta = k.vec2(k.randi(length), k.randi(-3))
-  return spawnGem(tilePos(start, delta))
+  const jumpForce = 60 + k.randi(delta.y * 10)
+
+  return spawnGem(tilePos(start, delta), jumpForce)
 }
 
 function addBoulder (pos) {
