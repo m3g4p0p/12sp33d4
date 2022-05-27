@@ -84,6 +84,7 @@ export function fade (time = 1, upScale = 1) {
     id: 'fade',
     require: ['opacity', 'scale'],
     add () {
+      this.unuse('solid')
       this.trigger('fade')
     },
     update () {

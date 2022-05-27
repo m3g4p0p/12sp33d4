@@ -21,11 +21,11 @@ export function spawnPlayer () {
   ])
 }
 
-export function spawnGem (pos, jumpForce) {
+export function spawnGem (name, pos, jumpForce = 50) {
   const gem = k.add([
     'gem',
     'booster',
-    k.sprite('gem'),
+    k.sprite(name),
     k.origin('center'),
     k.pos(pos),
     k.area(),

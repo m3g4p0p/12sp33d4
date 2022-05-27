@@ -31,8 +31,6 @@ function addGround (pos, tileX, tileY) {
 
   if (k.chance(0.33)) {
     spawnPlant(tilePos(pos, k.UP))
-  } else if (k.chance(0.2)) {
-    spawnSword(tilePos(pos, k.UP))
   }
 
   return tilePos(wall.pos, k.RIGHT)
@@ -42,18 +40,32 @@ function addGem (start, length) {
   const delta = k.vec2(k.randi(length), k.randi(-3))
   const jumpForce = 60 + k.randi(delta.y * 10)
 
-  return spawnGem(tilePos(start, delta), jumpForce)
+  return spawnGem('gem-large', tilePos(start, delta), jumpForce)
+}
+
+function addSword (start, length) {
+  if (k.get('sword').length > 0 || !k.chance(0.33)) {
+    return null
+  }
+
+  const delta = k.vec2(k.randi(length), -1)
+  return spawnSword(tilePos(start, delta))
 }
 
 function addBoulder (pos, exclude) {
   if (exclude.includes(pos.x)) {
-    return
+    return null
   }
 
   const delta = k.vec2(0, k.randi(-2, -5))
   const boulder = spawnWall(tilePos(pos, delta), 'wall-1-1')
 
+  boulder.use('boulder')
+  boulder.use(k.scale())
+  boulder.use(k.opacity())
   exclude.push(boulder.pos.x + TILE_SIZE)
+
+  return boulder
 }
 
 /**
@@ -65,6 +77,10 @@ function addBoulder (pos, exclude) {
 function addPlatform (start, length, count) {
   const gem = count > 0 ? addGem(start, length) : null
   const noBoulder = gem ? [gem.pos.x] : []
+
+  if (gem) {
+    addSword(start, length)
+  }
 
   const pos = range(length - 2).reduce(pos => {
     if (boulderChance(count)) {

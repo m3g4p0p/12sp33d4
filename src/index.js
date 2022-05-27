@@ -2,7 +2,7 @@ import { fade, followSpin } from './components.js'
 import { PLAYER_JUMP_FORCE, PLAYER_SPEED, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 import { groundLevel, platformGenerator } from './platforms.js'
-import { spawnIndicator, spawnPlayer, spawnScore } from './spawn.js'
+import { spawnGem, spawnIndicator, spawnPlayer, spawnScore, spawnSword } from './spawn.js'
 import { tileAt, tileset } from './tilemath.js'
 import { requestFullscreen, shake } from './util.js'
 import tiles from './assets/tiles.png'
@@ -15,7 +15,8 @@ k.loadSpriteAtlas(tiles, {
   ...tileset('bevel', 20, 3, 2, 2),
   ...tileset('plant', 0, 1, 4, 2),
   ...tileset('sword', 32, 7, 5, 1),
-  gem: tileAt(32, 10),
+  'gem-small': tileAt(22, 4),
+  'gem-large': tileAt(32, 10),
   player: {
     ...playerTile,
     anims: {
@@ -93,10 +94,6 @@ k.scene('main', () => {
       player.startJump(PLAYER_JUMP_FORCE)
     }
 
-    if (wieldedSword) {
-      player.spin(1000)
-    }
-
     activeBooster = null
   })
 
@@ -144,9 +141,21 @@ k.scene('main', () => {
       TILE_SIZE / -8
     )))
 
-    sword.use(k.timer(5, () => {
+    k.wait(5, () => {
       sword.use(fade(0.5))
-    }))
+    })
+  })
+
+  k.onCollide('sword', 'boulder', (sword, boulder) => {
+    if (sword !== wieldedSword) {
+      return
+    }
+
+    shake(6)
+    player.spin(1000)
+    boulder.unuse('wall')
+    boulder.use(fade(0.5))
+    spawnGem('gem-small', boulder.pos)
   })
 
   k.on('update', 'gem', gem => {
@@ -169,6 +178,12 @@ k.scene('main', () => {
   k.on('destroy', 'booster', booster => {
     if (booster === activeBooster) {
       activeBooster = null
+    }
+  })
+
+  k.on('destroy', 'sword', sword => {
+    if (sword === wieldedSword) {
+      wieldedSword = null
     }
   })
 
@@ -224,6 +239,10 @@ k.scene('main', () => {
   k.onKeyPress('<', () => {
     player.speed++
     spawnIndicator(indicatorOffset)
+  })
+
+  k.onKeyPress('s', () => {
+    spawnSword(player.pos)
   })
 
   window.player = player
