@@ -109,6 +109,10 @@ k.scene('main', () => {
     if (collision.isRight()) {
       player.velocity(0)
     }
+
+    if (collision.isTop()) {
+      player.stopJump()
+    }
   })
 
   k.onCollide('gem', 'player', gem => {
