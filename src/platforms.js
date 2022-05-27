@@ -44,7 +44,7 @@ function addGem (start, length) {
 }
 
 function addSword (start, length) {
-  if (k.get('sword').length > 0 || !k.chance(0.33)) {
+  if (start.x < k.width()) {
     return null
   }
 
@@ -52,8 +52,8 @@ function addSword (start, length) {
   return spawnSword(tilePos(start, delta))
 }
 
-function addBoulder (pos, exclude) {
-  if (exclude.includes(pos.x)) {
+function addBoulder (pos, occupied) {
+  if (occupied.includes(pos.x)) {
     return null
   }
 
@@ -63,7 +63,7 @@ function addBoulder (pos, exclude) {
   boulder.use('boulder')
   boulder.use(k.scale())
   boulder.use(k.opacity())
-  exclude.push(boulder.pos.x + TILE_SIZE)
+  occupied.push(boulder.pos.x + TILE_SIZE)
 
   return boulder
 }
@@ -76,15 +76,15 @@ function addBoulder (pos, exclude) {
  */
 function addPlatform (start, length, count) {
   const gem = count > 0 ? addGem(start, length) : null
-  const noBoulder = gem ? [gem.pos.x] : []
+  const occupied = gem ? [gem.pos.x] : []
 
-  if (gem) {
+  if (boulderChance(count)) {
     addSword(start, length)
   }
 
   const pos = range(length - 2).reduce(pos => {
     if (boulderChance(count)) {
-      addBoulder(pos, noBoulder)
+      addBoulder(pos, occupied)
     }
 
     return addGround(pos, 1, 0)
