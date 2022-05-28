@@ -1,18 +1,9 @@
-import { accelerate, bounce, cleanLeft, dynamicJump, fade, flicker, spinning, velocity } from './components.js'
+import { accelerate, bounce, cleanLeft, dieWith, dynamicJump, fade, flicker, followSpin, spinning, velocity } from './components.js'
 import { TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 
 function withGlow (target, color) {
   const glow = spawnGlow(target, color)
-
-  target.on('fade', () => {
-    glow.destroy()
-  })
-
-  target.onDestroy(() => {
-    glow.destroy()
-  })
-
   return Object.assign(target, { glow })
 }
 
@@ -45,8 +36,31 @@ export function spawnGlow (target, color) {
     k.layer('effects'),
     k.pos(target.pos),
     k.follow(target),
+    dieWith(target, ['destroy', 'fade']),
     flicker(0.2)
   ])
+}
+
+export function spawnShadow (target) {
+  const { sprite } = target.inspect()
+
+  const shadow = k.add([
+    k.layer('effects'),
+    k.origin('center'),
+    k.sprite(JSON.parse(sprite)),
+    k.pos(target.pos),
+    followSpin(target),
+    dieWith(target),
+    k.opacity(0.5),
+    k.rotate(),
+    k.color(),
+  ])
+
+  target.onDestroy(() => {
+    shadow.destroy()
+  })
+
+  return shadow
 }
 
 export function spawnGem (name, pos, jumpForce = 50) {
@@ -88,7 +102,7 @@ export function spawnPlant (pos) {
 }
 
 export function spawnSword (pos) {
-  return withGlow(k.add([
+  return k.add([
     'sword',
     k.sprite(`sword-${k.randi(4)}-0`),
     k.origin('center'),
@@ -100,7 +114,7 @@ export function spawnSword (pos) {
     k.opacity(),
     spinning(),
     cleanLeft()
-  ]), k.CYAN)
+  ])
 }
 
 export function spawnIndicator (offset) {

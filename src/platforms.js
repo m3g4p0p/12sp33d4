@@ -1,6 +1,6 @@
 import { TILE_SIZE } from './constants.js'
 import { k } from './init.js'
-import { spawnGem, spawnPlant, spawnSword, spawnWall } from './spawn.js'
+import { spawnGem, spawnPlant, spawnShadow, spawnSword, spawnWall } from './spawn.js'
 import { range } from './tilemath.js'
 
 export function groundLevel () {
@@ -44,12 +44,21 @@ function addGem (start, length) {
 }
 
 function addSword (start, length) {
-  if (start.x < k.width()) {
-    return null
-  }
-
   const delta = k.vec2(k.randi(length), -1)
-  return spawnSword(tilePos(start, delta))
+  const sword = spawnSword(tilePos(start, delta))
+  const shadow = spawnShadow(sword)
+  const timeOffset = k.randi(k.time())
+
+  shadow.onUpdate(() => {
+    const t = (k.time() + timeOffset) * 5
+
+    shadow.opacity = k.wave(0.1, 0.5, t)
+    shadow.color.r = k.wave(255, 0, t)
+    shadow.follow.offset = k.rand(
+      k.vec2(-1), k.vec2(1)).scale(k.wave(0, 4, t))
+  })
+
+  return sword
 }
 
 function addBoulder (pos, occupied) {
@@ -78,7 +87,7 @@ function addPlatform (start, length, count) {
   const gem = count > 0 ? addGem(start, length) : null
   const occupied = gem ? [gem.pos.x] : []
 
-  if (boulderChance(count)) {
+  if (gem) {
     addSword(start, length)
   }
 
@@ -108,3 +117,4 @@ export function platformGenerator (pos, maxLength) {
     next()
   }
 }
+

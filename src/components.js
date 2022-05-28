@@ -230,3 +230,14 @@ export function followSpin (target, offset) {
     }
   }
 }
+
+export function dieWith (target, events = ['destroy']) {
+  return {
+    id: 'dieWith',
+    add () {
+      events.forEach(event => {
+        target.on(event, () => this.destroy())
+      })
+    }
+  }
+}
