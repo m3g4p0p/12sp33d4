@@ -50,12 +50,16 @@ function addSword (start, length) {
   const timeOffset = k.randi(k.time())
 
   shadow.onUpdate(() => {
-    const t = (k.time() + timeOffset) * 5
+    const t = shadow.angle
+      ? k.deg2rad(shadow.angle)
+      : (k.time() + timeOffset) * 5
 
     shadow.opacity = k.wave(0.1, 0.5, t)
     shadow.color.r = k.wave(255, 0, t)
-    shadow.follow.offset = k.rand(
-      k.vec2(-1), k.vec2(1)).scale(k.wave(0, 4, t))
+
+    shadow.follow.offset = k
+      .rand(k.rand(k.vec2(-1), k.vec2(1)))
+      .scale(k.wave(0, 4, t))
   })
 
   return sword
