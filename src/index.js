@@ -145,6 +145,8 @@ k.scene('main', () => {
       TILE_SIZE / -8
     )))
 
+    sword.glow.destroy()
+
     k.wait(5, () => {
       sword.use(fade(0.5))
     })

@@ -2,6 +2,20 @@ import { accelerate, bounce, cleanLeft, dynamicJump, fade, flicker, spinning, ve
 import { TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 
+function withGlow (target, color) {
+  const glow = spawnGlow(target, color)
+
+  target.on('fade', () => {
+    glow.destroy()
+  })
+
+  target.onDestroy(() => {
+    glow.destroy()
+  })
+
+  return Object.assign(target, { glow })
+}
+
 export function spawnPlayer () {
   const start = k.vec2(TILE_SIZE, k.height() / 2)
 
@@ -21,8 +35,22 @@ export function spawnPlayer () {
   ])
 }
 
+export function spawnGlow (target, color) {
+  return k.add([
+    k.circle(TILE_SIZE / 2),
+    k.origin('center'),
+    k.color(color),
+    k.opacity(),
+    k.scale(),
+    k.layer('effects'),
+    k.pos(target.pos),
+    k.follow(target),
+    flicker(0.2)
+  ])
+}
+
 export function spawnGem (name, pos, jumpForce = 50) {
-  const gem = k.add([
+  return withGlow(k.add([
     'gem',
     'booster',
     k.sprite(name),
@@ -34,29 +62,7 @@ export function spawnGem (name, pos, jumpForce = 50) {
     k.body({ solid: false }),
     bounce(jumpForce),
     cleanLeft()
-  ])
-
-  const glow = k.add([
-    k.circle(TILE_SIZE / 2),
-    k.origin('center'),
-    k.color(k.YELLOW),
-    k.opacity(),
-    k.scale(),
-    k.layer('effects'),
-    k.pos(gem.pos),
-    k.follow(gem),
-    flicker(0.2)
-  ])
-
-  gem.on('fade', () => {
-    glow.destroy()
-  })
-
-  gem.onDestroy(() => {
-    glow.destroy()
-  })
-
-  return gem
+  ]), k.YELLOW)
 }
 
 export function spawnWall (pos, spriteName) {
@@ -82,7 +88,7 @@ export function spawnPlant (pos) {
 }
 
 export function spawnSword (pos) {
-  return k.add([
+  return withGlow(k.add([
     'sword',
     k.sprite(`sword-${k.randi(4)}-0`),
     k.origin('center'),
@@ -94,7 +100,7 @@ export function spawnSword (pos) {
     k.opacity(),
     spinning(),
     cleanLeft()
-  ])
+  ]), k.CYAN)
 }
 
 export function spawnIndicator (offset) {
