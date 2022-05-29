@@ -241,3 +241,16 @@ export function dieWith (target, events = ['destroy']) {
     }
   }
 }
+
+export function glitch (maxOffset) {
+  const p1 = k.vec2(-maxOffset)
+  const p2 = k.vec2(maxOffset)
+
+  return {
+    id: 'glitch',
+    require: ['follow'],
+    update () {
+      this.follow.offset = k.rand(p1, p2)
+    }
+  }
+}

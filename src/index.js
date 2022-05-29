@@ -249,6 +249,10 @@ k.scene('main', () => {
     spawnSword(player.pos)
   })
 
+  k.onKeyPress('a', () => {
+    player.spin(100)
+  })
+
   window.player = player
 })
 

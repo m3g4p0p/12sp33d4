@@ -1,3 +1,4 @@
+import { glitch } from './components.js'
 import { TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 import { spawnGem, spawnPlant, spawnShadow, spawnSword, spawnWall } from './spawn.js'
@@ -49,17 +50,22 @@ function addSword (start, length) {
   const shadow = spawnShadow(sword)
   const timeOffset = k.randi(k.time())
 
+  shadow.use(glitch(4))
+
   shadow.onUpdate(() => {
-    const t = shadow.angle
-      ? k.deg2rad(shadow.angle)
-      : (k.time() + timeOffset) * 5
+    if (shadow.angle) {
+      const t = k.deg2rad(shadow.angle)
 
-    shadow.opacity = k.wave(0.1, 0.5, t)
-    shadow.color.r = k.wave(255, 0, t)
+      shadow.opacity = 1
+      shadow.color.r = k.wave(0, 255, t)
+      shadow.color.g = k.wave(255, 0, t)
+    } else {
+      const t = (k.time() + timeOffset) * 5
 
-    shadow.follow.offset = k
-      .rand(k.rand(k.vec2(-1), k.vec2(1)))
-      .scale(k.wave(0, 4, t))
+      shadow.opacity = k.wave(0.1, 0.5, t)
+      shadow.color.r = k.wave(255, 0, t)
+      shadow.color.g = 255
+    }
   })
 
   return sword
