@@ -278,3 +278,17 @@ export function colorWave () {
     }
   }
 }
+
+export function moveTowards (target, speed, angle) {
+  let dest = target.pos.clone()
+
+  return {
+    id: 'moveTowards',
+    require: ['pos', 'rotate'],
+    update () {
+      dest = dest.lerp(target.pos, k.dt())
+      this.angle = this.pos.angle(dest) + angle
+      this.moveTo(dest, speed)
+    }
+  }
+}

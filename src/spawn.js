@@ -1,4 +1,4 @@
-import { accelerate, bounce, cleanLeft, colorWave, dieWith, dynamicJump, fade, flicker, followSpin, glitch, spinning, velocity } from './components.js'
+import { accelerate, bounce, cleanLeft, colorWave, dieWith, dynamicJump, fade, flicker, followSpin, glitch, moveTowards, spinning, velocity } from './components.js'
 import { GHOST_SPEED, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 
@@ -31,19 +31,17 @@ export function spawnPlayer () {
   ])
 }
 
-export function spawnGhost (pos, dest) {
-  const dir = dest.sub(pos)
-
+export function spawnGhost (pos, target) {
   return withShadow(k.add([
     'ghost',
     k.sprite('ghost'),
     k.origin('center'),
     k.pos(pos),
-    k.move(dir, GHOST_SPEED),
-    k.rotate(dir.angle() - 45),
+    k.rotate(),
     k.area(),
     k.opacity(),
     k.scale(),
+    moveTowards(target, GHOST_SPEED, -45),
     cleanLeft()
   ]))
 }

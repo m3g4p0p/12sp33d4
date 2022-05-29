@@ -192,11 +192,20 @@ k.scene('main', () => {
     gem.use(fade(1, -1))
   })
 
+  k.on('update', 'ghost', ghost => {
+    if (ghost.pos.x > player.pos.x) {
+      return
+    }
+
+    ghost.unuse('ghost')
+    ghost.use(fade(1, -1))
+  })
+
   k.on('destroy', 'wall', () => {
     const pos = spawnPlatforms()
 
     if (pos !== null && k.chance(0.33)) {
-      spawnGhost(pos, player.pos)
+      spawnGhost(pos, player)
     }
   })
 
