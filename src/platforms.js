@@ -1,4 +1,3 @@
-import { glitch } from './components.js'
 import { TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 import { spawnGem, spawnPlant, spawnShadow, spawnSword, spawnWall } from './spawn.js'
@@ -50,8 +49,6 @@ function addSword (start, length) {
   const shadow = spawnShadow(sword)
   const timeOffset = k.randi(k.time())
 
-  shadow.use(glitch(4))
-
   shadow.onUpdate(() => {
     if (shadow.angle) {
       const t = k.deg2rad(shadow.angle)
@@ -97,7 +94,7 @@ function addPlatform (start, length, count) {
   const gem = count > 0 ? addGem(start, length) : null
   const occupied = gem ? [gem.pos.x] : []
 
-  if (gem) {
+  if (count > 0 && count % 5 === 0) {
     addSword(start, length)
   }
 
@@ -114,17 +111,18 @@ function addPlatform (start, length, count) {
 }
 
 export function platformGenerator (pos, maxLength) {
+  let lastPos = pos
   let count = 0
 
   return function next () {
     if (k.toScreen(pos).x > k.width() * 2) {
-      return
+      return pos === lastPos ? null : (lastPos = pos)
     }
 
     const length = k.randi(maxLength)
     pos = addPlatform(pos, length, count++)
 
-    next()
+    return next()
   }
 }
 

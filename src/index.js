@@ -2,7 +2,7 @@ import { fade, followSpin } from './components.js'
 import { PLAYER_JUMP_FORCE, PLAYER_SPEED, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 import { groundLevel, platformGenerator } from './platforms.js'
-import { spawnGem, spawnIndicator, spawnPlayer, spawnScore, spawnSword } from './spawn.js'
+import { spawnGem, spawnGhost, spawnIndicator, spawnPlayer, spawnScore, spawnShadow, spawnSword } from './spawn.js'
 import { tileAt, tileset } from './tilemath.js'
 import { requestFullscreen, shake } from './util.js'
 import tiles from './assets/tiles.png'
@@ -17,6 +17,7 @@ k.loadSpriteAtlas(tiles, {
   ...tileset('sword', 32, 7, 5, 1),
   'gem-small': tileAt(22, 4),
   'gem-large': tileAt(32, 10),
+  ghost: tileAt(26, 6),
   player: {
     ...playerTile,
     anims: {
@@ -71,6 +72,24 @@ k.scene('main', () => {
   let activeBooster = null
   let wieldedSword = null
 
+  function addScore (pos, color) {
+    score.text += player.speed
+    spawnScore(player.speed, pos, color)
+  }
+
+  function attacks (callback) {
+    return (sword, target) => {
+      if (sword !== wieldedSword) {
+        return
+      }
+
+      target.use(fade(0.5))
+      player.spin(1000)
+      callback(target)
+      shake(6)
+    }
+  }
+
   k.layers([
     'background',
     'effects',
@@ -84,7 +103,6 @@ k.scene('main', () => {
 
   spawnPlatforms()
   spawnIndicator(indicatorOffset)
-  k.on('destroy', 'wall', spawnPlatforms)
 
   k.onClick(() => {
     if (activeBooster || (
@@ -115,10 +133,12 @@ k.scene('main', () => {
     }
   })
 
-  k.onCollide('gem', 'player', gem => {
-    score.text += player.speed
+  k.onCollide('player', 'ghost', () => {
+    player.destroy()
+  })
 
-    spawnScore(player.speed, gem.pos)
+  k.onCollide('gem', 'player', gem => {
+    addScore(gem.pos, k.YELLOW)
     gem.unuse('gem')
     gem.use(fade())
   })
@@ -150,17 +170,15 @@ k.scene('main', () => {
     })
   })
 
-  k.onCollide('sword', 'boulder', (sword, boulder) => {
-    if (sword !== wieldedSword) {
-      return
-    }
-
-    shake(6)
-    player.spin(1000)
+  k.onCollide('sword', 'boulder', attacks(boulder => {
     boulder.unuse('wall')
-    boulder.use(fade(0.5))
     spawnGem('gem-small', boulder.pos)
-  })
+  }))
+
+  k.onCollide('sword', 'ghost', attacks(ghost => {
+    addScore(ghost.pos, k.CYAN)
+    ghost.unuse('ghost')
+  }))
 
   k.on('update', 'gem', gem => {
     if (
@@ -172,6 +190,14 @@ k.scene('main', () => {
 
     gem.unuse('gem')
     gem.use(fade(1, -1))
+  })
+
+  k.on('destroy', 'wall', () => {
+    const pos = spawnPlatforms()
+
+    if (pos !== null && k.chance(0.33)) {
+      spawnShadow(spawnGhost(pos, player.pos))
+    }
   })
 
   k.on('destroy', 'booster', () => {

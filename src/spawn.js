@@ -1,5 +1,5 @@
-import { accelerate, bounce, cleanLeft, dieWith, dynamicJump, fade, flicker, followSpin, spinning, velocity } from './components.js'
-import { TILE_SIZE } from './constants.js'
+import { accelerate, bounce, cleanLeft, dieWith, dynamicJump, fade, flicker, followSpin, glitch, spinning, velocity } from './components.js'
+import { GHOST_SPEED, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 
 function withGlow (target, color) {
@@ -26,6 +26,22 @@ export function spawnPlayer () {
   ])
 }
 
+export function spawnGhost (pos, dest) {
+  const dir = dest.sub(pos)
+  return k.add([
+    'ghost',
+    k.sprite('ghost'),
+    k.origin('center'),
+    k.pos(pos),
+    k.move(dir, GHOST_SPEED),
+    k.rotate(dir.angle() - 45),
+    k.area(),
+    k.opacity(),
+    k.scale(),
+    cleanLeft()
+  ])
+}
+
 export function spawnGlow (target, color) {
   return k.add([
     k.circle(TILE_SIZE / 2),
@@ -49,11 +65,12 @@ export function spawnShadow (target) {
     k.origin('center'),
     k.sprite(JSON.parse(sprite)),
     k.pos(target.pos),
-    followSpin(target),
-    dieWith(target),
     k.opacity(0.5),
     k.rotate(),
     k.color(),
+    followSpin(target),
+    dieWith(target),
+    glitch(4),
   ])
 
   target.onDestroy(() => {
@@ -130,7 +147,7 @@ export function spawnIndicator (offset) {
   ])
 }
 
-export function spawnScore (value, pos) {
+export function spawnScore (value, pos, color) {
   return k.add([
     k.text(value, {
       size: 20 + value,
@@ -138,7 +155,7 @@ export function spawnScore (value, pos) {
     }),
     k.layer('ui'),
     k.origin('center'),
-    k.color(k.YELLOW),
+    k.color(color),
     k.pos(pos),
     k.opacity(),
     k.scale(),
