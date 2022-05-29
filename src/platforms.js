@@ -45,27 +45,7 @@ function addGem (start, length) {
 
 function addSword (start, length) {
   const delta = k.vec2(k.randi(length), -1)
-  const sword = spawnSword(tilePos(start, delta))
-  const shadow = spawnShadow(sword)
-  const timeOffset = k.randi(k.time())
-
-  shadow.onUpdate(() => {
-    if (shadow.angle) {
-      const t = k.deg2rad(shadow.angle)
-
-      shadow.opacity = 1
-      shadow.color.r = k.wave(0, 255, t)
-      shadow.color.g = k.wave(255, 0, t)
-    } else {
-      const t = (k.time() + timeOffset) * 5
-
-      shadow.opacity = k.wave(0.1, 0.5, t)
-      shadow.color.r = k.wave(255, 0, t)
-      shadow.color.g = 255
-    }
-  })
-
-  return sword
+  return spawnSword(tilePos(start, delta))
 }
 
 function addBoulder (pos, occupied) {
@@ -125,4 +105,3 @@ export function platformGenerator (pos, maxLength) {
     return next()
   }
 }
-

@@ -1,10 +1,15 @@
-import { accelerate, bounce, cleanLeft, dieWith, dynamicJump, fade, flicker, followSpin, glitch, spinning, velocity } from './components.js'
+import { accelerate, bounce, cleanLeft, colorWave, dieWith, dynamicJump, fade, flicker, followSpin, glitch, spinning, velocity } from './components.js'
 import { GHOST_SPEED, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 
 function withGlow (target, color) {
   const glow = spawnGlow(target, color)
   return Object.assign(target, { glow })
+}
+
+function withShadow (target) {
+  const shadow = spawnShadow(target)
+  return Object.assign(target, { shadow })
 }
 
 export function spawnPlayer () {
@@ -28,7 +33,8 @@ export function spawnPlayer () {
 
 export function spawnGhost (pos, dest) {
   const dir = dest.sub(pos)
-  return k.add([
+
+  return withShadow(k.add([
     'ghost',
     k.sprite('ghost'),
     k.origin('center'),
@@ -39,7 +45,7 @@ export function spawnGhost (pos, dest) {
     k.opacity(),
     k.scale(),
     cleanLeft()
-  ])
+  ]))
 }
 
 export function spawnGlow (target, color) {
@@ -60,7 +66,7 @@ export function spawnGlow (target, color) {
 export function spawnShadow (target) {
   const { sprite } = target.inspect()
 
-  const shadow = k.add([
+  return k.add([
     k.layer('effects'),
     k.origin('center'),
     k.sprite(JSON.parse(sprite)),
@@ -69,15 +75,9 @@ export function spawnShadow (target) {
     k.rotate(),
     k.color(),
     followSpin(target),
-    dieWith(target),
+    dieWith(target, ['destroy', 'fade']),
     glitch(4)
   ])
-
-  target.onDestroy(() => {
-    shadow.destroy()
-  })
-
-  return shadow
 }
 
 export function spawnGem (name, pos, jumpForce = 50) {
@@ -119,7 +119,7 @@ export function spawnPlant (pos) {
 }
 
 export function spawnSword (pos) {
-  return k.add([
+  const sword = k.add([
     'sword',
     k.sprite(`sword-${k.randi(4)}-0`),
     k.origin('center'),
@@ -132,6 +132,9 @@ export function spawnSword (pos) {
     spinning(),
     cleanLeft()
   ])
+
+  spawnShadow(sword).use(colorWave())
+  return sword
 }
 
 export function spawnIndicator (offset) {

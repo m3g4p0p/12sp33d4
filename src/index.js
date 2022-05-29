@@ -196,7 +196,7 @@ k.scene('main', () => {
     const pos = spawnPlatforms()
 
     if (pos !== null && k.chance(0.33)) {
-      spawnShadow(spawnGhost(pos, player.pos))
+      spawnGhost(pos, player.pos)
     }
   })
 
