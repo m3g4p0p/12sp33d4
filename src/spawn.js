@@ -70,7 +70,7 @@ export function spawnShadow (target) {
     k.color(),
     followSpin(target),
     dieWith(target),
-    glitch(4),
+    glitch(4)
   ])
 
   target.onDestroy(() => {

@@ -2,9 +2,7 @@
   "name": "12sp33d4",
   "type": "module",
   "standard": {
-    "env": {
-      "browser": true
-    },
+    "env": ["browser"],
     "globals": ["DEVELOP"]
   },
   "scripts": {
