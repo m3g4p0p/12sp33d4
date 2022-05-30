@@ -199,8 +199,9 @@ k.scene('main', () => {
       return
     }
 
+    ghost.reverse()
     ghost.unuse('ghost')
-    ghost.use(fade(1, -1))
+    ghost.use(fade(2, -1))
   })
 
   k.on('destroy', 'wall', () => {
