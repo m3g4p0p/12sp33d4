@@ -193,6 +193,8 @@ k.scene('main', () => {
   })
 
   k.on('update', 'ghost', ghost => {
+    ghost.angle += k.wave(-15, 15, k.time() * 5)
+
     if (ghost.pos.x > player.pos.x) {
       return
     }
@@ -286,6 +288,10 @@ k.scene('main', () => {
 
   k.onKeyPress('a', () => {
     player.spin(100)
+  })
+
+  k.onKeyPress('g', () => {
+    spawnGhost(k.toWorld(k.vec2(k.width(), 100)), player)
   })
 
   window.player = player
