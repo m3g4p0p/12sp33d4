@@ -267,13 +267,11 @@ export function colorWave () {
 
         this.opacity = 1
         this.color.r = k.wave(0, 255, t)
-        this.color.g = k.wave(255, 0, t)
       } else {
         const t = (k.time() + timeOffset) * 5
 
         this.opacity = k.wave(0.1, 0.5, t)
         this.color.r = k.wave(255, 0, t)
-        this.color.g = 255
       }
     }
   }
