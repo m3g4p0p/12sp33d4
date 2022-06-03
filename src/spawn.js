@@ -163,3 +163,16 @@ export function spawnScore (value, pos, color) {
     fade(1, 2)
   ])
 }
+
+export function spawnDeath () {
+  return k.add([
+    'death',
+    k.sprite('skull'),
+    k.origin('center'),
+    k.pos(k.center()),
+    k.opacity(),
+    k.scale(),
+    k.fixed(),
+    fade(1, 10)
+  ])
+}
