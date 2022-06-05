@@ -12,12 +12,12 @@ function withShadow (target) {
   return Object.assign(target, { shadow })
 }
 
-export function spawnPlayer () {
+export function spawnPlayer (color) {
   const start = k.vec2(TILE_SIZE, k.height() / 2)
 
   return k.add([
     'player',
-    k.sprite('player'),
+    k.sprite(`player-${color}`),
     k.origin('center'),
     k.pos(start),
     velocity(5),

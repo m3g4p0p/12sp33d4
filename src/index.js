@@ -1,33 +1,22 @@
 import { fade, followSpin } from './components.js'
-import { PLAYER_JUMP_FORCE, PLAYER_SPEED, TILE_SIZE } from './constants.js'
+import { PLAYER_COLOR, PLAYER_JUMP_FORCE, PLAYER_SPEED, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 import { groundLevel, platformGenerator } from './platforms.js'
 import { spawnDeath, spawnGem, spawnGhost, spawnIndicator, spawnPlayer, spawnScore, spawnShadow, spawnSword } from './spawn.js'
-import { tileAt, tileset } from './tilemath.js'
+import { playerTiles, tileAt, tileset } from './tilemath.js'
 import { requestFullscreen, shake } from './util.js'
 import tiles from './assets/tiles.png'
-
-const playerTile = tileAt(18, 9, 6)
-playerTile.y++
 
 k.loadSpriteAtlas(tiles, {
   ...tileset('wall', 18, 0, 3, 3),
   ...tileset('bevel', 20, 3, 2, 2),
   ...tileset('plant', 0, 1, 4, 2),
   ...tileset('sword', 32, 7, 5, 1),
+  ...playerTiles(),
   'gem-small': tileAt(22, 4),
   'gem-large': tileAt(32, 10),
   ghost: tileAt(26, 6),
-  skull: tileAt(38, 11),
-  player: {
-    ...playerTile,
-    anims: {
-      idle: 0,
-      walk: { from: 1, to: 2 },
-      jump: 3,
-      fall: 4
-    }
-  }
+  skull: tileAt(38, 11)
 })
 
 function setAnim (obj, anim, options) {
@@ -58,7 +47,7 @@ k.scene('start', () => {
 })
 
 k.scene('main', () => {
-  const player = spawnPlayer()
+  const player = spawnPlayer('green')
 
   const spawnPlatforms = platformGenerator(
     player.pos.add(k.DOWN), 10)
