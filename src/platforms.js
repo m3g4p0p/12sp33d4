@@ -1,6 +1,6 @@
 import { TILE_SIZE } from './constants.js'
 import { k } from './init.js'
-import { spawnGem, spawnPlant, spawnShadow, spawnSword, spawnWall } from './spawn.js'
+import { spawnGem, spawnPlant, spawnShadow, spawnSword, spawnTorch, spawnWall } from './spawn.js'
 import { range } from './tilemath.js'
 
 export function groundLevel () {
@@ -13,6 +13,21 @@ function tilePos (pos, delta) {
 
 function boulderChance (count) {
   return k.chance(0.33 - 0.33 / 1.05 ** count)
+}
+
+function unlessOccupied (occupied, pos, chance, factory) {
+  if (!chance || occupied.includes(pos.x)) {
+    return
+  }
+
+  const obj = factory(pos)
+
+  occupied.push(
+    obj.pos.x,
+    obj.pos.x + TILE_SIZE
+  )
+
+  return obj
 }
 
 function addSubsoil (pos, tileX) {
@@ -48,20 +63,19 @@ function addSword (start, length) {
   return spawnSword(tilePos(start, delta))
 }
 
-function addBoulder (pos, occupied) {
-  if (occupied.includes(pos.x)) {
-    return null
-  }
-
+function addBoulder (pos) {
   const delta = k.vec2(0, k.randi(-2, -5))
   const boulder = spawnWall(tilePos(pos, delta), 'wall-1-1')
 
   boulder.use('boulder')
   boulder.use(k.scale())
   boulder.use(k.opacity())
-  occupied.push(boulder.pos.x + TILE_SIZE)
 
   return boulder
+}
+
+function addTorch (pos) {
+  return spawnTorch(tilePos(pos, k.vec2(0, k.randi(-1, -5))))
 }
 
 /**
@@ -79,9 +93,8 @@ function addPlatform (start, length, count) {
   }
 
   const pos = range(length - 2).reduce(pos => {
-    if (boulderChance(count)) {
-      addBoulder(pos, occupied)
-    }
+    unlessOccupied(occupied, pos, boulderChance(count), addBoulder)
+    unlessOccupied(occupied, pos, k.chance(0.33), addTorch)
 
     return addGround(pos, 1, 0)
   }, addGround(start, 0, 0))

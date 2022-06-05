@@ -116,6 +116,13 @@ export function spawnPlant (pos) {
   ])
 }
 
+export function spawnTorch (pos) {
+  return k.add([
+    k.sprite('torch'),
+    k.pos(pos)
+  ])
+}
+
 export function spawnSword (pos) {
   const sword = k.add([
     'sword',

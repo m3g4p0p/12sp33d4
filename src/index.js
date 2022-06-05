@@ -1,8 +1,8 @@
 import { fade, followSpin } from './components.js'
-import { PLAYER_COLOR, PLAYER_JUMP_FORCE, PLAYER_SPEED, TILE_SIZE } from './constants.js'
+import { PLAYER_JUMP_FORCE, PLAYER_SPEED, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 import { groundLevel, platformGenerator } from './platforms.js'
-import { spawnDeath, spawnGem, spawnGhost, spawnIndicator, spawnPlayer, spawnScore, spawnShadow, spawnSword } from './spawn.js'
+import { spawnDeath, spawnGem, spawnGhost, spawnIndicator, spawnPlayer, spawnScore, spawnSword } from './spawn.js'
 import { playerTiles, tileAt, tileset } from './tilemath.js'
 import { requestFullscreen, shake } from './util.js'
 import tiles from './assets/tiles.png'
@@ -16,7 +16,8 @@ k.loadSpriteAtlas(tiles, {
   'gem-small': tileAt(22, 4),
   'gem-large': tileAt(32, 10),
   ghost: tileAt(26, 6),
-  skull: tileAt(38, 11)
+  skull: tileAt(38, 11),
+  torch: tileAt(4, 15)
 })
 
 function setAnim (obj, anim, options) {
