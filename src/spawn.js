@@ -1,4 +1,4 @@
-import { accelerate, bounce, cleanLeft, colorWave, dieWith, dynamicJump, fade, flicker, followSpin, glitch, moveTowards, spinning, velocity } from './components.js'
+import { accelerate, bounce, cleanLeft, colorWave, dieWith, dynamicJump, fade, flicker, followSpin, glitch, moveTowards, parallax, spinning, velocity } from './components.js'
 import { GHOST_SPEED, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 
@@ -119,7 +119,13 @@ export function spawnPlant (pos) {
 export function spawnTorch (pos) {
   return k.add([
     k.sprite('torch'),
-    k.pos(pos)
+    k.layer('background'),
+    k.origin('center'),
+    k.opacity(k.rand(0.2, 0.8)),
+    k.pos(),
+    k.fixed(),
+    parallax(pos, k.vec2(0.9, 0.99)),
+    cleanLeft()
   ])
 }
 

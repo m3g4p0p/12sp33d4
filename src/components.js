@@ -66,7 +66,11 @@ export function cleanLeft () {
     id: 'cleanLeft',
     require: ['pos'],
     update () {
-      if (k.toScreen(this.pos).x + this.width < 0) {
+      const pos = this.is('fixed')
+        ? this.pos
+        : k.toScreen(this.pos)
+
+      if (pos.x + this.width < 0) {
         this.destroy()
       }
     }
@@ -294,3 +298,43 @@ export function moveTowards (target, speed, angle) {
     }
   }
 }
+
+export function parallax (pos, factor = 0) {
+  return {
+    id: 'parallax',
+    require: ['pos', 'fixed'],
+    update () {
+      const delta = k.camPos().sub(pos)
+      this.pos = k.center().sub(delta.scale(factor))
+    }
+  }
+}
+
+k.scene('debug', () => {
+  for (let i = 0; i < 10; i++) {
+    const obj = k.add([
+      k.origin('center'),
+      k.rect(10, 10),
+      k.pos(k.center().add(i * 100, 0))
+    ])
+
+    k.add([
+      k.origin('center'),
+      k.rect(10, 10),
+      k.pos(),
+      k.fixed(),
+      k.color(255, 255, 0),
+      parallax(obj.pos.clone(), 0.5)
+    ])
+  }
+
+  k.add([
+    k.origin('center'),
+    k.circle(10),
+    k.pos(k.center())
+  ])
+
+  k.onUpdate(() => {
+    k.camPos(k.mousePos())
+  })
+})

@@ -75,7 +75,8 @@ function addBoulder (pos) {
 }
 
 function addTorch (pos) {
-  return spawnTorch(tilePos(pos, k.vec2(0, k.randi(-1, -5))))
+  const delta = k.vec2(0, k.randi(-1, -3))
+  return spawnTorch(tilePos(pos, delta))
 }
 
 /**
