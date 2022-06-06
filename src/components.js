@@ -299,42 +299,60 @@ export function moveTowards (target, speed, angle) {
   }
 }
 
-export function parallax (pos, factor = 0) {
+export function parallax (factor = 0) {
+  const initialPos = k.vec2()
+  const scale = k.vec2(1).sub(factor)
+
   return {
     id: 'parallax',
-    require: ['pos', 'fixed'],
+    require: ['pos'],
+    add () {
+      Object.assign(initialPos, this.pos)
+    },
     update () {
-      const delta = k.camPos().sub(pos)
-      this.pos = k.center().sub(delta.scale(factor))
+      const camPos = k.camPos()
+      const delta = initialPos.sub(camPos)
+
+      this.pos = camPos.add(delta.scale(scale))
+
+      // k.drawLine({
+      //   p1: this.pos,
+      //   p2: initialPos
+      // })
     }
   }
 }
 
 k.scene('debug', () => {
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 20; i++) {
     const obj = k.add([
       k.origin('center'),
       k.rect(10, 10),
       k.pos(k.center().add(i * 100, 0))
     ])
 
-    k.add([
-      k.origin('center'),
-      k.rect(10, 10),
-      k.pos(),
-      k.fixed(),
-      k.color(255, 255, 0),
-      parallax(obj.pos.clone(), 0.5)
-    ])
+    for (let j = 1; j < 10; j++) {
+      k.add([
+        k.origin('center'),
+        k.rect(10 - j, 10 - j),
+        k.pos(obj.pos.clone()),
+        k.opacity(1 - 0.1 * j),
+        parallax(0.1 * j)
+      ])
+    }
   }
 
-  k.add([
+  const circle = k.add([
     k.origin('center'),
     k.circle(10),
     k.pos(k.center())
   ])
 
   k.onUpdate(() => {
-    k.camPos(k.mousePos())
+    k.camPos(circle.pos)
+  })
+
+  k.onMouseDown(pos => {
+    circle.move(k.toWorld(pos).sub(k.camPos()))
   })
 })

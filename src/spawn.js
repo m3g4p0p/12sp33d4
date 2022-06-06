@@ -122,9 +122,8 @@ export function spawnTorch (pos) {
     k.layer('background'),
     k.origin('center'),
     k.opacity(k.rand(0.2, 0.8)),
-    k.pos(),
-    k.fixed(),
-    parallax(pos, k.vec2(0.9, 0.99)),
+    k.pos(pos),
+    parallax(k.vec2(0.1, 0)),
     cleanLeft()
   ])
 }
