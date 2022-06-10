@@ -11,8 +11,16 @@ export function tileAt (x, y, width = 1, height = 1) {
   }
 }
 
-export function range (length) {
-  return Array.from({ length }, (_, i) => i)
+export function range (start, stop) {
+  if (stop === undefined) {
+    stop = start
+    start = 0
+  }
+
+  return Array.from(
+    { length: stop - start },
+    (_, i) => i + start
+  )
 }
 
 function ranges (length, ...rest) {

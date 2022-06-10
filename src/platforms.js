@@ -95,7 +95,7 @@ function addPlatform (start, length, count) {
 
   const pos = range(length - 2).reduce(pos => {
     unlessOccupied(occupied, pos, boulderChance(count), addBoulder)
-    unlessOccupied(occupied, pos, k.chance(0.33), addTorch)
+    unlessOccupied(occupied, pos, k.chance(0.2), addTorch)
 
     return addGround(pos, 1, 0)
   }, addGround(start, 0, 0))

@@ -1,6 +1,7 @@
 import { accelerate, bounce, cleanLeft, colorWave, dieWith, dynamicJump, fade, flicker, followSpin, glitch, moveTowards, parallax, spinning, velocity } from './components.js'
-import { GHOST_SPEED, TILE_SIZE } from './constants.js'
+import { GHOST_SPEED, SQRT_2, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
+import { range } from './tilemath.js'
 
 function withGlow (target, color) {
   const glow = spawnGlow(target, color)
@@ -117,15 +118,30 @@ export function spawnPlant (pos) {
 }
 
 export function spawnTorch (pos) {
-  return k.add([
+  const torch = k.add([
     k.sprite('torch'),
     k.layer('background'),
     k.origin('center'),
-    k.opacity(k.rand(0.2, 0.8)),
+    k.opacity(0.5),
     k.pos(pos),
-    parallax(k.vec2(0.1, 0)),
+    parallax(0.1),
     cleanLeft()
   ])
+
+  range(3).forEach(i => {
+    k.add([
+      k.circle(torch.width / 2 * SQRT_2 ** i),
+      k.layer('effects'),
+      k.origin('center'),
+      k.color(k.YELLOW),
+      k.opacity(0.05),
+      k.pos(pos),
+      parallax(0.1 + 0.01 * i),
+      dieWith(torch)
+    ])
+  })
+
+  return torch
 }
 
 export function spawnSword (pos) {

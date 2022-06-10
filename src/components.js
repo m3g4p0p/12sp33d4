@@ -340,6 +340,16 @@ k.scene('debug', () => {
         parallax(0.1 * j)
       ])
     }
+
+    for (let j = -1; j > -10; j--) {
+      k.add([
+        k.origin('center'),
+        k.rect(10 - j, 10 - j),
+        k.pos(obj.pos.clone()),
+        k.opacity(1 - 0.1 * j),
+        parallax(0.1 * j)
+      ])
+    }
   }
 
   const circle = k.add([
