@@ -151,24 +151,26 @@ k.scene('main', () => {
 
     wieldedSword = sword
 
+    sword.on('death', () => {
+      sword.use(fade(0.5))
+    })
+
     sword.use(followSpin(player, k.vec2(
       TILE_SIZE / 2,
       TILE_SIZE / -8
     )))
-
-    k.wait(5, () => {
-      sword.use(fade(0.5))
-    })
   })
 
   k.onCollide('sword', 'boulder', attacks(boulder => {
+    wieldedSword.hurt(1)
     boulder.unuse('wall')
     spawnGem('gem-small', boulder.pos)
   }))
 
   k.onCollide('sword', 'ghost', attacks(ghost => {
-    addScore(ghost.pos, k.CYAN)
+    wieldedSword.heal(1)
     ghost.unuse('ghost')
+    addScore(ghost.pos, k.CYAN)
   }))
 
   k.on('update', 'gem', gem => {

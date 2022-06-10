@@ -151,6 +151,7 @@ export function spawnSword (pos) {
     k.origin('center'),
     k.pos(pos),
     k.z(-1),
+    k.health(3),
     k.area(),
     k.scale(),
     k.rotate(),
