@@ -1,4 +1,4 @@
-import { fade, followSpin } from './components.js'
+import { dieWith, fade, followSpin } from './components.js'
 import { PLAYER_JUMP_FORCE, PLAYER_SPEED, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
 import { groundLevel, platformGenerator } from './platforms.js'
@@ -150,7 +150,6 @@ k.scene('main', () => {
     }
 
     wieldedSword = sword
-    sword.orbit = true
 
     sword.on('death', () => {
       sword.use(fade(0.5))
@@ -162,15 +161,20 @@ k.scene('main', () => {
     )))
 
     sword.use(followSpin())
+    sword.use(dieWith(player))
   })
 
   k.onCollide('sword', 'boulder', attacks(boulder => {
+    wieldedSword.orbit = false
+
     wieldedSword.hurt(1)
     boulder.unuse('wall')
     spawnGem('gem-small', boulder.pos)
   }))
 
   k.onCollide('sword', 'ghost', attacks(ghost => {
+    wieldedSword.orbit = true
+
     wieldedSword.heal(1)
     ghost.unuse('ghost')
     addScore(ghost.pos, k.CYAN)
