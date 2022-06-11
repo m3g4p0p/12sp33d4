@@ -73,7 +73,8 @@ export function spawnShadow (target) {
     k.opacity(0.5),
     k.rotate(),
     k.color(),
-    followSpin(target),
+    k.follow(target),
+    followSpin(),
     dieWith(target, ['destroy', 'fade']),
     glitch(4)
   ])

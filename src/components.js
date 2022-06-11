@@ -222,15 +222,34 @@ export function spinning () {
   }
 }
 
-export function followSpin (target, offset) {
+/**
+ *
+ * @param {import('kaboom').GameObj} target
+ * @param {import('kaboom').Vec2} offset
+ * @returns
+ */
+export function followSpin () {
   return {
     id: 'followSpin',
-    require: ['rotate'],
-    add () {
-      this.use(k.follow(target, offset))
-    },
+    require: ['rotate', 'follow'],
+    orbit: false,
     update () {
-      this.angle = target.angle
+      const { obj, offset } = this.follow
+
+      this.angle = obj.angle
+
+      if (!this.orbit) {
+        return
+      }
+
+      const offsetLength = offset.len()
+      const offsetAngle = offset.angle()
+      const angle = k.deg2rad(this.angle + offsetAngle)
+
+      this.pos = obj.pos.add(
+        offsetLength * Math.cos(angle),
+        offsetLength * Math.sin(angle)
+      )
     }
   }
 }
@@ -314,11 +333,6 @@ export function parallax (factor = 0) {
       const delta = initialPos.sub(camPos)
 
       this.pos = camPos.add(delta.scale(scale))
-
-      // k.drawLine({
-      //   p1: this.pos,
-      //   p2: initialPos
-      // })
     }
   }
 }

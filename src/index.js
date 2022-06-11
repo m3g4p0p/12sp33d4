@@ -150,15 +150,18 @@ k.scene('main', () => {
     }
 
     wieldedSword = sword
+    sword.orbit = true
 
     sword.on('death', () => {
       sword.use(fade(0.5))
     })
 
-    sword.use(followSpin(player, k.vec2(
+    sword.use(k.follow(player, k.vec2(
       TILE_SIZE / 2,
       TILE_SIZE / -8
     )))
+
+    sword.use(followSpin())
   })
 
   k.onCollide('sword', 'boulder', attacks(boulder => {
