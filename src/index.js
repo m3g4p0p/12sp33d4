@@ -292,6 +292,10 @@ k.scene('main', () => {
   })
 
   k.onKeyPress('a', () => {
+    if (wieldedSword) {
+      wieldedSword.orbit = true
+    }
+
     player.spin(100)
   })
 

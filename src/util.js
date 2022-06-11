@@ -25,6 +25,16 @@ export function requestFullscreen () {
   canvas.requestFullscreen().catch(console.error)
 }
 
+export function rotateVec (vec, deg) {
+  const angle = k.deg2rad(deg + vec.angle())
+  const length = vec.len()
+
+  return k.vec2(
+    length * Math.cos(angle),
+    length * Math.sin(angle)
+  )
+}
+
 export function shake (intensity) {
   k.shake(intensity)
 

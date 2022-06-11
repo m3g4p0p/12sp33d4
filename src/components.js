@@ -1,5 +1,5 @@
 import { k } from './init.js'
-import { thresh } from './util.js'
+import { rotateVec, thresh } from './util.js'
 
 /**
  * @returns {import("kaboom").Comp}
@@ -242,13 +242,8 @@ export function followSpin () {
         return
       }
 
-      const offsetLength = offset.len()
-      const offsetAngle = offset.angle()
-      const angle = k.deg2rad(this.angle + offsetAngle)
-
       this.pos = obj.pos.add(
-        offsetLength * Math.cos(angle),
-        offsetLength * Math.sin(angle)
+        rotateVec(offset, this.angle)
       )
     }
   }
