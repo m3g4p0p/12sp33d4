@@ -4,7 +4,7 @@ import { k } from './init.js'
 import { groundLevel, platformGenerator } from './platforms.js'
 import { spawnDeath, spawnGem, spawnGhost, spawnIndicator, spawnPlayer, spawnScore, spawnSword } from './spawn.js'
 import { playerTiles, tileAt, tileset } from './tiles.js'
-import { requestFullscreen, shake } from './util.js'
+import { range, requestFullscreen, shake } from './util.js'
 import tiles from './assets/tiles.png'
 
 k.loadSpriteAtlas(tiles, {
@@ -26,12 +26,13 @@ function setAnim (obj, anim, options) {
   }
 }
 
-function addUiText (text, x, y) {
+function addUiText (text, x, y, indicatorColor) {
   return k.add([
     k.text(text, { size: 10 }),
     k.layer('ui'),
     k.pos(x, y),
-    k.fixed()
+    k.fixed(),
+    { indicatorColor }
   ])
 }
 
@@ -55,8 +56,8 @@ k.scene('main', () => {
 
   const scoreLabel = addUiText('SCORE', 10, 10)
   const score = addUiText(0, scoreLabel.width + 20, 10)
-  const speedLabel = addUiText('SPEED', 10, k.height() - 20)
-  const swordLabel = addUiText('SWORD', 10, speedLabel.pos.y - 20)
+  const speedLabel = addUiText('SPEED', 10, k.height() - 20, { g: 32 })
+  const swordLabel = addUiText('SWORD', 10, speedLabel.pos.y - 20, { g: 32, b: 32 })
   const maxCamOffset = k.center().x / TILE_SIZE
 
   let camOffset = maxCamOffset
@@ -159,7 +160,22 @@ k.scene('main', () => {
       swordLabel.hidden = false
     }
 
-    sword.on('death', () => {
+    range(
+      k.get('indicator:sword').length,
+      wieldedSword.hp()
+    ).forEach(() => {
+      spawnIndicator(swordLabel)
+    })
+
+    sword.onHeal(() => {
+      spawnIndicator(swordLabel)
+    })
+
+    sword.onHurt(() => {
+      k.get('indicator:sword').pop().destroy()
+    })
+
+    sword.onDeath(() => {
       sword.use(fade(0.5))
     })
 
