@@ -1,7 +1,7 @@
 import { accelerate, bounce, cleanLeft, colorWave, dieWith, dynamicJump, fade, flicker, followSpin, glitch, moveTowards, parallax, spinning, velocity } from './components.js'
 import { GHOST_SPEED, SQRT_2, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
-import { range } from './tilemath.js'
+import { range } from './util.js'
 
 function withGlow (target, color) {
   const glow = spawnGlow(target, color)

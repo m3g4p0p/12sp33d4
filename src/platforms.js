@@ -1,7 +1,7 @@
 import { TILE_SIZE } from './constants.js'
 import { k } from './init.js'
-import { spawnGem, spawnPlant, spawnShadow, spawnSword, spawnTorch, spawnWall } from './spawn.js'
-import { range } from './tilemath.js'
+import { spawnGem, spawnPlant, spawnSword, spawnTorch, spawnWall } from './spawn.js'
+import { range } from './util.js'
 
 export function groundLevel () {
   return Math.max(...k.get('wall').map(wall => wall.pos.y))

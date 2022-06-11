@@ -1,5 +1,5 @@
 import { k } from './init.js'
-import { thresh } from './tilemath.js'
+import { thresh } from './util.js'
 
 /**
  * @returns {import("kaboom").Comp}

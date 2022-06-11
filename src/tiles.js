@@ -1,4 +1,5 @@
 import { PLAYER_COLOR, TILE_SIZE } from './constants.js'
+import { ranges } from './util.js'
 
 export function tileAt (x, y, width = 1, height = 1) {
   return {
@@ -9,26 +10,6 @@ export function tileAt (x, y, width = 1, height = 1) {
     sliceX: width,
     sliceY: height
   }
-}
-
-export function range (start, stop) {
-  if (stop === undefined) {
-    stop = start
-    start = 0
-  }
-
-  return Array.from(
-    { length: stop - start },
-    (_, i) => i + start
-  )
-}
-
-function ranges (length, ...rest) {
-  return Array.from({ length }, (_, i) => rest.length ? ranges(...rest) : i)
-}
-
-export function thresh (value, min) {
-  return value < min ? 0 : value
 }
 
 export function playerTiles () {
