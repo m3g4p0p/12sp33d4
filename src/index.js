@@ -146,10 +146,15 @@ k.scene('main', () => {
 
   k.onCollide('sword', 'player', sword => {
     if (wieldedSword) {
-      wieldedSword.destroy()
-    }
+      wieldedSword.setHP(Math.max(
+        wieldedSword.hp() + 1,
+        sword.hp()
+      ))
 
-    wieldedSword = sword
+      sword.destroy()
+    } else {
+      wieldedSword = sword
+    }
 
     sword.on('death', () => {
       sword.use(fade(0.5))
@@ -167,7 +172,7 @@ k.scene('main', () => {
   k.onCollide('sword', 'boulder', attacks(boulder => {
     wieldedSword.orbit = false
 
-    wieldedSword.hurt(1)
+    wieldedSword.hurt()
     boulder.unuse('wall')
     spawnGem('gem-small', boulder.pos)
   }))
@@ -175,7 +180,7 @@ k.scene('main', () => {
   k.onCollide('sword', 'ghost', attacks(ghost => {
     wieldedSword.orbit = true
 
-    wieldedSword.heal(1)
+    wieldedSword.heal()
     ghost.unuse('ghost')
     addScore(ghost.pos, k.CYAN)
   }))
