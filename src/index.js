@@ -56,12 +56,14 @@ k.scene('main', () => {
   const scoreLabel = addUiText('SCORE', 10, 10)
   const score = addUiText(0, scoreLabel.width + 20, 10)
   const speedLabel = addUiText('SPEED', 10, k.height() - 20)
-  const indicatorOffset = k.vec2(speedLabel.width + 20, speedLabel.pos.y)
+  const swordLabel = addUiText('SWORD', 10, speedLabel.pos.y - 20)
   const maxCamOffset = k.center().x / TILE_SIZE
 
   let camOffset = maxCamOffset
   let activeBooster = null
   let wieldedSword = null
+
+  swordLabel.hidden = true
 
   function addScore (pos, color) {
     score.text += player.speed
@@ -93,7 +95,7 @@ k.scene('main', () => {
   k.gravity(100)
 
   spawnPlatforms()
-  spawnIndicator(indicatorOffset)
+  spawnIndicator(speedLabel)
 
   k.onClick(() => {
     if (activeBooster || (
@@ -140,7 +142,7 @@ k.scene('main', () => {
 
     booster.unuse('booster')
     player.accelerate(PLAYER_SPEED)
-    spawnIndicator(indicatorOffset)
+    spawnIndicator(speedLabel)
     shake(6)
   })
 
@@ -154,6 +156,7 @@ k.scene('main', () => {
       sword.destroy()
     } else {
       wieldedSword = sword
+      swordLabel.hidden = false
     }
 
     sword.on('death', () => {
@@ -219,7 +222,7 @@ k.scene('main', () => {
 
   k.on('destroy', 'booster', () => {
     player.speed = Math.ceil(player.speed / 2)
-    k.get('indicator').splice(player.speed).forEach(k.destroy)
+    k.get('indicator:speed').splice(player.speed).forEach(k.destroy)
   })
 
   k.on('destroy', 'booster', booster => {
@@ -229,9 +232,12 @@ k.scene('main', () => {
   })
 
   k.on('destroy', 'sword', sword => {
-    if (sword === wieldedSword) {
-      wieldedSword = null
+    if (sword !== wieldedSword) {
+      return
     }
+
+    wieldedSword = null
+    swordLabel.hidden = true
   })
 
   k.on('destroy', 'death', () => {
@@ -289,7 +295,7 @@ k.scene('main', () => {
 
   k.onKeyPress('<', () => {
     player.speed++
-    spawnIndicator(indicatorOffset)
+    spawnIndicator(speedLabel)
   })
 
   k.onKeyPress('s', () => {

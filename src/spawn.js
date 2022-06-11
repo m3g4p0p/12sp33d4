@@ -165,11 +165,13 @@ export function spawnSword (pos) {
   return sword
 }
 
-export function spawnIndicator (offset) {
-  const index = k.get('indicator').length
+export function spawnIndicator (label) {
+  const offset = k.vec2(label.width + 20, label.pos.y)
+  const tag = 'indicator:' + label.text.toLowerCase()
+  const index = k.get(tag).length
 
   return k.add([
-    'indicator',
+    tag,
     k.layer('ui'),
     k.fixed(),
     k.rect(8, 8),
