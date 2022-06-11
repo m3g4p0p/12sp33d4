@@ -169,18 +169,34 @@ export function spawnIndicator (label) {
   const { r = 0, g = 0, b = 0 } = label.indicatorColor
   const offset = k.vec2(label.width + 20, label.pos.y)
   const tag = 'indicator:' + label.text.toLowerCase()
-  const index = k.get(tag).length
+  const existing = k.get(tag)
+  const index = existing.length
+  const prev = existing[existing.length - 1]
 
-  return k.add([
+  const indicator = k.add([
     tag,
-    k.layer('ui'),
-    k.fixed(),
     k.rect(8, 8),
+    k.layer('ui'),
+    k.opacity(0),
+    k.fixed(),
     k.pos(k.vec2(10 * index, 1).add(offset)),
     k.color(k.rgb(...[r, g, b].map(
       value => value * (index + 1)
     )))
   ])
+
+  const cancel = indicator.onUpdate(() => {
+    indicator.opacity = Math.min(
+      prev ? prev.opacity - 0.1 : 1,
+      indicator.opacity + k.dt()
+    )
+
+    if (indicator.opacity >= 1) {
+      cancel()
+    }
+  })
+
+  return indicator
 }
 
 export function spawnScore (value, pos, color) {
