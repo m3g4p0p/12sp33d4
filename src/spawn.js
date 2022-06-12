@@ -165,10 +165,8 @@ export function spawnSword (pos) {
   return sword
 }
 
-export function spawnIndicator (label) {
-  const { r = 0, g = 0, b = 0 } = label.indicatorColor
-  const offset = k.vec2(label.width + 20, label.pos.y)
-  const tag = 'indicator:' + label.text.toLowerCase()
+export function spawnIndicator (tag, offset, color) {
+  const { r = 0, g = 0, b = 0 } = color
   const existing = k.get(tag)
   const index = existing.length
   const prev = existing[existing.length - 1]

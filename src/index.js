@@ -26,13 +26,34 @@ function setAnim (obj, anim, options) {
   }
 }
 
-function addUiText (text, x, y, indicatorColor) {
+function addUiText (text, x, y, color) {
+  const tag = typeof text === 'string'
+    ? 'indicator:' + text.toLowerCase()
+    : 'indicator'
+
   return k.add([
     k.text(text, { size: 10 }),
     k.layer('ui'),
     k.pos(x, y),
     k.fixed(),
-    { indicatorColor }
+    {
+      getIndicators () {
+        return k.get(tag).length
+      },
+      setIndicators (value) {
+        const current = this.getIndicators()
+
+        if (value < current) {
+          return k.get(tag).slice(value).forEach(k.destroy)
+        }
+
+        const offset = k.vec2(this.width + 20, this.pos.y)
+
+        range(value - current).forEach(() => {
+          spawnIndicator(tag, offset, color)
+        })
+      }
+    }
   ])
 }
 
@@ -71,6 +92,10 @@ k.scene('main', () => {
     spawnScore(player.speed, pos, color)
   }
 
+  function updateSwordHealth () {
+    swordLabel.setIndicators(wieldedSword.hp())
+  }
+
   function attacks (callback) {
     return (sword, target) => {
       if (sword !== wieldedSword) {
@@ -96,7 +121,7 @@ k.scene('main', () => {
   k.gravity(100)
 
   spawnPlatforms()
-  spawnIndicator(speedLabel)
+  speedLabel.setIndicators(player.speed)
 
   k.onClick(() => {
     if (activeBooster || (
@@ -138,12 +163,12 @@ k.scene('main', () => {
   })
 
   k.onCollide('booster', 'player', booster => {
-    activeBooster = booster
     player.speed++
+    speedLabel.setIndicators(player.speed)
+    activeBooster = booster
 
     booster.unuse('booster')
     player.accelerate(PLAYER_SPEED)
-    spawnIndicator(speedLabel)
     shake(6)
   })
 
@@ -154,26 +179,15 @@ k.scene('main', () => {
         sword.hp()
       ))
 
-      sword.destroy()
-    } else {
-      wieldedSword = sword
-      swordLabel.hidden = false
+      return sword.destroy()
     }
 
-    range(
-      k.get('indicator:sword').length,
-      wieldedSword.hp()
-    ).forEach(() => {
-      spawnIndicator(swordLabel)
-    })
+    wieldedSword = sword
+    swordLabel.hidden = false
 
-    sword.onHeal(() => {
-      spawnIndicator(swordLabel)
-    })
-
-    sword.onHurt(() => {
-      k.get('indicator:sword').pop().destroy()
-    })
+    updateSwordHealth()
+    sword.onHeal(updateSwordHealth)
+    sword.onHurt(updateSwordHealth)
 
     sword.onDeath(() => {
       sword.use(fade(0.5))
@@ -238,7 +252,7 @@ k.scene('main', () => {
 
   k.on('destroy', 'booster', () => {
     player.speed = Math.ceil(player.speed / 2)
-    k.get('indicator:speed').splice(player.speed).forEach(k.destroy)
+    speedLabel.setIndicators(player.speed)
   })
 
   k.on('destroy', 'booster', booster => {
@@ -311,7 +325,7 @@ k.scene('main', () => {
 
   k.onKeyPress('<', () => {
     player.speed++
-    spawnIndicator(speedLabel)
+    speedLabel.setIndicators(player.speed)
   })
 
   k.onKeyPress('s', () => {
