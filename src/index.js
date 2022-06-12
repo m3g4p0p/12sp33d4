@@ -104,6 +104,7 @@ k.scene('main', () => {
 
       target.use(fade(0.5))
       player.spin(1000)
+      sword.hurt()
       callback(target)
       shake(6)
     }
@@ -164,21 +165,17 @@ k.scene('main', () => {
 
   k.onCollide('booster', 'player', booster => {
     player.speed++
-    speedLabel.setIndicators(player.speed)
     activeBooster = booster
 
     booster.unuse('booster')
     player.accelerate(PLAYER_SPEED)
+    speedLabel.setIndicators(player.speed)
     shake(6)
   })
 
   k.onCollide('sword', 'player', sword => {
     if (wieldedSword) {
-      wieldedSword.setHP(Math.max(
-        wieldedSword.hp() + 1,
-        sword.hp()
-      ))
-
+      wieldedSword.heal(sword.hp())
       return sword.destroy()
     }
 
@@ -191,6 +188,7 @@ k.scene('main', () => {
 
     sword.onDeath(() => {
       sword.use(fade(0.5))
+      sword.unuse('sword')
     })
 
     sword.use(k.follow(player, k.vec2(
@@ -205,7 +203,6 @@ k.scene('main', () => {
   k.onCollide('sword', 'boulder', attacks(boulder => {
     wieldedSword.orbit = false
 
-    wieldedSword.hurt()
     boulder.unuse('wall')
     spawnGem('gem-small', boulder.pos)
   }))
@@ -213,7 +210,6 @@ k.scene('main', () => {
   k.onCollide('sword', 'ghost', attacks(ghost => {
     wieldedSword.orbit = true
 
-    wieldedSword.heal()
     ghost.unuse('ghost')
     addScore(ghost.pos, k.CYAN)
   }))
