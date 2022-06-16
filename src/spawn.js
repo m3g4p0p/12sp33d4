@@ -1,29 +1,90 @@
-import { accelerate, bounce, cleanLeft, dynamicJump, fade, flicker, velocity } from './components.js'
-import { TILE_SIZE } from './constants.js'
+import { accelerate, bounce, cleanLeft, colorWave, dieWith, dynamicJump, fade, flicker, followSpin, glitch, moveTowards, parallax, spinning, velocity } from './components.js'
+import { GHOST_SPEED, SQRT_2, TILE_SIZE } from './constants.js'
 import { k } from './init.js'
+import { range } from './util.js'
 
-export function spawnPlayer () {
+function withGlow (target, color) {
+  const glow = spawnGlow(target, color)
+  return Object.assign(target, { glow })
+}
+
+function withShadow (target) {
+  const shadow = spawnShadow(target)
+  return Object.assign(target, { shadow })
+}
+
+export function spawnPlayer (color) {
   const start = k.vec2(TILE_SIZE, k.height() / 2)
 
   return k.add([
     'player',
-    k.sprite('player'),
+    k.sprite(`player-${color}`),
     k.origin('center'),
     k.pos(start),
     velocity(5),
     accelerate(),
     dynamicJump(0.5),
+    spinning(),
     k.area(),
     k.body(),
+    k.rotate(),
     k.cleanup()
   ])
 }
 
-export function spawnGem (pos, jumpForce) {
-  const gem = k.add([
+export function spawnGhost (pos, target) {
+  return withShadow(k.add([
+    'ghost',
+    k.sprite('ghost'),
+    k.origin('center'),
+    k.pos(pos),
+    k.rotate(),
+    k.area(),
+    k.opacity(),
+    k.scale(),
+    moveTowards(target, GHOST_SPEED, -45),
+    cleanLeft()
+  ]))
+}
+
+export function spawnGlow (target, color) {
+  return k.add([
+    k.circle(TILE_SIZE / 2),
+    k.origin('center'),
+    k.color(color),
+    k.opacity(),
+    k.scale(),
+    k.layer('effects'),
+    k.pos(target.pos),
+    k.follow(target),
+    dieWith(target, ['destroy', 'fade']),
+    flicker(0.2)
+  ])
+}
+
+export function spawnShadow (target) {
+  const { sprite } = target.inspect()
+
+  return k.add([
+    k.layer('effects'),
+    k.origin('center'),
+    k.sprite(JSON.parse(sprite)),
+    k.pos(target.pos),
+    k.opacity(0.5),
+    k.rotate(),
+    k.color(),
+    k.follow(target),
+    followSpin(),
+    dieWith(target, ['destroy', 'fade']),
+    glitch(4)
+  ])
+}
+
+export function spawnGem (name, pos, jumpForce = 50) {
+  return withGlow(k.add([
     'gem',
     'booster',
-    k.sprite('gem'),
+    k.sprite(name),
     k.origin('center'),
     k.pos(pos),
     k.area(),
@@ -32,29 +93,7 @@ export function spawnGem (pos, jumpForce) {
     k.body({ solid: false }),
     bounce(jumpForce),
     cleanLeft()
-  ])
-
-  const glow = k.add([
-    k.circle(TILE_SIZE / 2),
-    k.origin('center'),
-    k.color(k.YELLOW),
-    k.opacity(),
-    k.scale(),
-    k.layer('effects'),
-    k.pos(gem.pos),
-    k.follow(gem),
-    flicker(0.2)
-  ])
-
-  gem.on('fade', () => {
-    glow.destroy()
-  })
-
-  gem.onDestroy(() => {
-    glow.destroy()
-  })
-
-  return gem
+  ]), k.YELLOW)
 }
 
 export function spawnWall (pos, spriteName) {
@@ -69,19 +108,6 @@ export function spawnWall (pos, spriteName) {
   ])
 }
 
-export function spawnIndicator (offset) {
-  const index = k.get('indicator').length
-
-  return k.add([
-    'indicator',
-    k.layer('ui'),
-    k.fixed(),
-    k.rect(8, 8),
-    k.pos(k.vec2(10 * index, 1).add(offset)),
-    k.color(k.rgb(0, (index + 1) * 32, 0))
-  ])
-}
-
 export function spawnPlant (pos) {
   return k.add([
     k.sprite(`plant-${k.randi(4)}-${k.randi(1, 2)}`),
@@ -92,7 +118,86 @@ export function spawnPlant (pos) {
   ])
 }
 
-export function spawnScore (value, pos) {
+export function spawnTorch (pos) {
+  const torch = k.add([
+    k.sprite('torch'),
+    k.layer('background'),
+    k.origin('center'),
+    k.opacity(0.5),
+    k.pos(pos),
+    parallax(0.1),
+    cleanLeft()
+  ])
+
+  range(3).forEach(i => {
+    k.add([
+      k.circle(torch.width / 2 * SQRT_2 ** i),
+      k.layer('effects'),
+      k.origin('center'),
+      k.color(k.YELLOW),
+      k.opacity(0.05),
+      k.pos(pos),
+      parallax(0.1 + 0.01 * i),
+      dieWith(torch)
+    ])
+  })
+
+  return torch
+}
+
+export function spawnSword (pos) {
+  const sword = k.add([
+    'sword',
+    k.sprite(`sword-${k.randi(4)}-0`),
+    k.origin('center'),
+    k.pos(pos),
+    k.z(-1),
+    k.health(3),
+    k.area(),
+    k.scale(),
+    k.rotate(),
+    k.opacity(),
+    spinning(),
+    cleanLeft()
+  ])
+
+  spawnShadow(sword).use(colorWave())
+  return sword
+}
+
+export function spawnIndicator (tag, offset, color) {
+  const { r = 0, g = 0, b = 0 } = color
+  const existing = k.get(tag)
+  const index = existing.length
+  const prev = existing[existing.length - 1]
+
+  const indicator = k.add([
+    tag,
+    k.rect(8, 8),
+    k.layer('ui'),
+    k.opacity(0),
+    k.fixed(),
+    k.pos(k.vec2(10 * index, 1).add(offset)),
+    k.color(k.rgb(...[r, g, b].map(
+      value => value * (index + 1)
+    )))
+  ])
+
+  const cancel = indicator.onUpdate(() => {
+    indicator.opacity = Math.min(
+      prev ? prev.opacity - 0.1 : 1,
+      indicator.opacity + k.dt()
+    )
+
+    if (indicator.opacity >= 1) {
+      cancel()
+    }
+  })
+
+  return indicator
+}
+
+export function spawnScore (value, pos, color) {
   return k.add([
     k.text(value, {
       size: 20 + value,
@@ -100,10 +205,23 @@ export function spawnScore (value, pos) {
     }),
     k.layer('ui'),
     k.origin('center'),
-    k.color(k.YELLOW),
+    k.color(color),
     k.pos(pos),
     k.opacity(),
     k.scale(),
     fade(1, 2)
+  ])
+}
+
+export function spawnDeath () {
+  return k.add([
+    'death',
+    k.sprite('skull'),
+    k.origin('center'),
+    k.pos(k.center()),
+    k.opacity(),
+    k.scale(),
+    k.fixed(),
+    fade(1, 10)
   ])
 }

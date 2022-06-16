@@ -1,4 +1,5 @@
-import { TILE_SIZE } from './constants.js'
+import { PLAYER_COLOR, TILE_SIZE } from './constants.js'
+import { ranges } from './util.js'
 
 export function tileAt (x, y, width = 1, height = 1) {
   return {
@@ -11,16 +12,24 @@ export function tileAt (x, y, width = 1, height = 1) {
   }
 }
 
-export function range (length) {
-  return Array.from({ length }, (_, i) => i)
-}
+export function playerTiles () {
+  return PLAYER_COLOR.reduce((result, color, index) => {
+    const tile = tileAt(18, 7 + index, 6)
 
-function ranges (length, ...rest) {
-  return Array.from({ length }, (_, i) => rest.length ? ranges(...rest) : i)
-}
-
-export function thresh (value, min) {
-  return value < min ? 0 : value
+    tile.y++
+    return {
+      ...result,
+      [`player-${color}`]: {
+        ...tile,
+        anims: {
+          idle: 0,
+          walk: { from: 1, to: 2 },
+          jump: 3,
+          fall: 4
+        }
+      }
+    }
+  }, {})
 }
 
 export function tileset (name, x, y, width, height) {

@@ -1,5 +1,5 @@
 import { k } from './init.js'
-import { thresh } from './tilemath.js'
+import { rotateVec, thresh } from './util.js'
 
 /**
  * @returns {import("kaboom").Comp}
@@ -66,7 +66,11 @@ export function cleanLeft () {
     id: 'cleanLeft',
     require: ['pos'],
     update () {
-      if (k.toScreen(this.pos).x + this.width < 0) {
+      const pos = this.is('fixed')
+        ? this.pos
+        : k.toScreen(this.pos)
+
+      if (pos.x + this.width < 0) {
         this.destroy()
       }
     }
@@ -84,6 +88,7 @@ export function fade (time = 1, upScale = 1) {
     id: 'fade',
     require: ['opacity', 'scale'],
     add () {
+      this.unuse('solid')
       this.trigger('fade')
     },
     update () {
@@ -188,3 +193,185 @@ export function lagBehind (target, maxDist = target.width) {
     }
   }
 }
+
+export function spinning () {
+  let _speed = null
+
+  return {
+    id: 'spinning',
+    require: ['rotate'],
+    spin (speed) {
+      if (_speed === null) {
+        _speed = speed
+      }
+    },
+    update () {
+      if (_speed === null) {
+        return
+      }
+
+      const nextAngle = this.angle + k.dt() * _speed
+
+      if (nextAngle < 360) {
+        this.angle = nextAngle
+      } else {
+        this.angle = 0
+        _speed = null
+      }
+    }
+  }
+}
+
+/**
+ *
+ * @param {import('kaboom').GameObj} target
+ * @param {import('kaboom').Vec2} offset
+ * @returns
+ */
+export function followSpin () {
+  return {
+    id: 'followSpin',
+    require: ['rotate', 'follow'],
+    orbit: false,
+    update () {
+      const { obj, offset } = this.follow
+
+      this.angle = obj.angle
+
+      if (!this.orbit) {
+        return
+      }
+
+      this.pos = obj.pos.add(
+        rotateVec(offset, this.angle)
+      )
+    }
+  }
+}
+
+export function dieWith (target, events = ['destroy']) {
+  return {
+    id: 'dieWith',
+    add () {
+      events.forEach(event => {
+        target.on(event, () => this.destroy())
+      })
+    }
+  }
+}
+
+export function glitch (maxOffset) {
+  const p1 = k.vec2(-maxOffset)
+  const p2 = k.vec2(maxOffset)
+
+  return {
+    id: 'glitch',
+    require: ['follow'],
+    update () {
+      this.follow.offset = k.rand(p1, p2)
+    }
+  }
+}
+
+export function colorWave () {
+  const timeOffset = k.randi(k.time())
+
+  return {
+    id: 'colorWave',
+    require: ['color', 'opacity'],
+    update () {
+      if (this.angle) {
+        const t = k.deg2rad(this.angle)
+
+        this.opacity = 1
+        this.color.r = k.wave(0, 255, t)
+      } else {
+        const t = (k.time() + timeOffset) * 5
+
+        this.opacity = k.wave(0.1, 0.5, t)
+        this.color.r = k.wave(255, 0, t)
+      }
+    }
+  }
+}
+
+export function moveTowards (target, speed, angle) {
+  let dest = target.pos.clone()
+  let dir = 1
+
+  return {
+    id: 'moveTowards',
+    require: ['pos', 'rotate'],
+    reverse () {
+      dir = -dir
+    },
+    update () {
+      dest = dest.lerp(target.pos, k.dt() * dir)
+      this.angle = this.pos.angle(dest) + angle
+      this.moveTo(dest, speed)
+    }
+  }
+}
+
+export function parallax (factor = 0) {
+  const initialPos = k.vec2()
+  const scale = k.vec2(1).sub(factor)
+
+  return {
+    id: 'parallax',
+    require: ['pos'],
+    add () {
+      Object.assign(initialPos, this.pos)
+    },
+    update () {
+      const camPos = k.camPos()
+      const delta = initialPos.sub(camPos)
+
+      this.pos = camPos.add(delta.scale(scale))
+    }
+  }
+}
+
+k.scene('debug', () => {
+  for (let i = 0; i < 20; i++) {
+    const obj = k.add([
+      k.origin('center'),
+      k.rect(10, 10),
+      k.pos(k.center().add(i * 100, 0))
+    ])
+
+    for (let j = 1; j < 10; j++) {
+      k.add([
+        k.origin('center'),
+        k.rect(10 - j, 10 - j),
+        k.pos(obj.pos.clone()),
+        k.opacity(1 - 0.1 * j),
+        parallax(0.1 * j)
+      ])
+    }
+
+    for (let j = -1; j > -10; j--) {
+      k.add([
+        k.origin('center'),
+        k.rect(10 - j, 10 - j),
+        k.pos(obj.pos.clone()),
+        k.opacity(1 - 0.1 * j),
+        parallax(0.1 * j)
+      ])
+    }
+  }
+
+  const circle = k.add([
+    k.origin('center'),
+    k.circle(10),
+    k.pos(k.center())
+  ])
+
+  k.onUpdate(() => {
+    k.camPos(circle.pos)
+  })
+
+  k.onMouseDown(pos => {
+    circle.move(k.toWorld(pos).sub(k.camPos()))
+  })
+})

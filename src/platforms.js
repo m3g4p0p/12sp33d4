@@ -1,7 +1,7 @@
 import { TILE_SIZE } from './constants.js'
 import { k } from './init.js'
-import { spawnGem, spawnPlant, spawnWall } from './spawn.js'
-import { range } from './tilemath.js'
+import { spawnGem, spawnPlant, spawnSword, spawnTorch, spawnWall } from './spawn.js'
+import { range } from './util.js'
 
 export function groundLevel () {
   return Math.max(...k.get('wall').map(wall => wall.pos.y))
@@ -13,6 +13,21 @@ function tilePos (pos, delta) {
 
 function boulderChance (count) {
   return k.chance(0.33 - 0.33 / 1.05 ** count)
+}
+
+function unlessOccupied (occupied, pos, chance, factory) {
+  if (!chance || occupied.includes(pos.x)) {
+    return
+  }
+
+  const obj = factory(pos)
+
+  occupied.push(
+    obj.pos.x,
+    obj.pos.x + TILE_SIZE
+  )
+
+  return obj
 }
 
 function addSubsoil (pos, tileX) {
@@ -40,18 +55,28 @@ function addGem (start, length) {
   const delta = k.vec2(k.randi(length), k.randi(-3))
   const jumpForce = 60 + k.randi(delta.y * 10)
 
-  return spawnGem(tilePos(start, delta), jumpForce)
+  return spawnGem('gem-large', tilePos(start, delta), jumpForce)
 }
 
-function addBoulder (pos, exclude) {
-  if (exclude.includes(pos.x)) {
-    return
-  }
+function addSword (start, length) {
+  const delta = k.vec2(k.randi(length), -1)
+  return spawnSword(tilePos(start, delta))
+}
 
+function addBoulder (pos) {
   const delta = k.vec2(0, k.randi(-2, -5))
   const boulder = spawnWall(tilePos(pos, delta), 'wall-1-1')
 
-  exclude.push(boulder.pos.x + TILE_SIZE)
+  boulder.use('boulder')
+  boulder.use(k.scale())
+  boulder.use(k.opacity())
+
+  return boulder
+}
+
+function addTorch (pos) {
+  const delta = k.vec2(0, k.randi(-1, -3))
+  return spawnTorch(tilePos(pos, delta))
 }
 
 /**
@@ -62,12 +87,15 @@ function addBoulder (pos, exclude) {
  */
 function addPlatform (start, length, count) {
   const gem = count > 0 ? addGem(start, length) : null
-  const noBoulder = gem ? [gem.pos.x] : []
+  const occupied = gem ? [gem.pos.x] : []
+
+  if (count > 0 && count % 5 === 0) {
+    addSword(start, length)
+  }
 
   const pos = range(length - 2).reduce(pos => {
-    if (boulderChance(count)) {
-      addBoulder(pos, noBoulder)
-    }
+    unlessOccupied(occupied, pos, boulderChance(count), addBoulder)
+    unlessOccupied(occupied, pos, k.chance(0.1), addTorch)
 
     return addGround(pos, 1, 0)
   }, addGround(start, 0, 0))
@@ -77,16 +105,17 @@ function addPlatform (start, length, count) {
 }
 
 export function platformGenerator (pos, maxLength) {
+  let lastPos = pos
   let count = 0
 
   return function next () {
     if (k.toScreen(pos).x > k.width() * 2) {
-      return
+      return pos === lastPos ? null : (lastPos = pos)
     }
 
     const length = k.randi(maxLength)
     pos = addPlatform(pos, length, count++)
 
-    next()
+    return next()
   }
 }
